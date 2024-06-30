@@ -10,7 +10,7 @@ type Props = {
 
 const Container = ({ title, step, bottomEle, children }: Props) => {
   return (
-    <div className="w-full flex flex-col min-h-full flex-1">
+    <div className="w-full flex flex-col h-full flex-1">
       <Title className='mb-12'>{title}</Title>
       <StepIndicator steps={[1,2,3]} currentStep={step} />
       {children}

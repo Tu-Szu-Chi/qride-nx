@@ -13,7 +13,7 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({ currentStep, steps }) => 
           <div className={`
             flex items-center justify-center
             w-12 h-12 rounded-sm
-            ${index + 1 <= currentStep ? 'bg-primary text-white' : 'bg-white text-gray-500 border border-gray-300'}
+            ${index + 1 == currentStep ? 'bg-primary text-white' : 'bg-white text-gray-500 border border-gray-300'}
             font-bold text-xl
           `}>
             {index + 1}
