@@ -1,14 +1,15 @@
 import { Module, Global } from '@nestjs/common';
 import pool from './db.config';
+import { Pool } from 'pg'
 
 @Global()
 @Module({
   providers: [
     {
-      provide: 'DATABASE_POOL',
+      provide: Pool,
       useValue: pool,
     },
   ],
-  exports: ['DATABASE_POOL'],
+  exports: [Pool],
 })
 export class DatabaseModule {}

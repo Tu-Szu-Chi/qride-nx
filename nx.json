@@ -9,7 +9,6 @@
         "sourceMap": true
       }
     },
-    },
     "lint": {
       "cache": true,
       "inputs": [

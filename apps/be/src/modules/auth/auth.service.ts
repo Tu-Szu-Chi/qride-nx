@@ -1,11 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {  Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
-import { User } from '../user/entities/user.entity';
+import { User } from '@org/types';
 
 import * as bcrypt from 'bcrypt';
 import { omit } from 'lodash';
-import { Pool, QueryResult } from 'pg';
 
 @Injectable()
 export class AuthService {
@@ -18,21 +17,27 @@ export class AuthService {
   async validateUser(phone: string, password: string): Promise<Partial<User> | undefined> {
     
     const user = await this.userService.findOne(phone);
-    return user;
-    // if (user && await bcrypt.compare(password, user.password)) {
-    //   return omit(user, 'password');
-    // }
+    if (user && await bcrypt.compare(password, user.password)) {
+      return omit(user, 'password');
+    }
     return null;
   }
 
-  async login(phone: string, userId: string) {
-    const payload = { phone: phone, sub: userId };
+  async login(phone: string, password: string) {
+    const user = await this.validateUser(phone, password);
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    const payload = { phone: phone, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
+      user_id: user.id
     };
   }
 
   // async register(username: string, password: string) {
+  // const saltRounds = 10;
   //   const hashedPassword = await bcrypt.hash(password, 10);
   //   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   //   await this.userService.create(username, hashedPassword, otp);

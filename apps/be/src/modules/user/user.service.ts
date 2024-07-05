@@ -1,28 +1,21 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { User } from './entities/user.entity';
-import { SignupPayload } from '@org/types';
-import * as bcrypt from 'bcrypt';
-import { Pool, QueryResult } from 'pg';
+import { SignupPayload, User, UserVO } from '@org/types';
+import { UserRepository } from './user.repository';
+import { omit } from 'lodash';
 
 @Injectable()
 export class UserService {
   constructor(
-    @Inject('DATABASE_POOL') private pool: Pool,
+    private readonly userRepository: UserRepository
   ) {}
 
   async findOne(phone: string): Promise<User | undefined> {
-    const user: QueryResult<User> = await this.pool.query(`
-      SELECT * from users
-      WHERE phone = ${phone}
-      limit 1; 
-      `)
-      console.log(user.rows)
-      // const query = {
-      //   text: 'SELECT * FROM users WHERE phone = $1 LIMIT 1',
-      //   values: [phone],
-      // };
-      // const user: QueryResult<User> = await this.pool.query(query);
-      return user.rows[0];
+      const user = await this.userRepository.findByPhone(phone)
+      return user;
+  }
+  async getUserInfo(userId: string): Promise<UserVO | undefined> {
+    const user = await this.userRepository.findById(userId)
+    return omit(user, ['is_delete', 'created_at', 'updated_at', 'password'])
   }
 
   // async findById(id: string): Promise<User | undefined> {
