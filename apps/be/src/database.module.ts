@@ -1,6 +1,8 @@
 import { Module, Global } from '@nestjs/common';
-import pool from './db.config';
+import pool, {db} from './db.config';
 import { Pool } from 'pg'
+
+export const KNEX_CONNECTION = Symbol('KNEX_CONNECTION');
 
 @Global()
 @Module({
@@ -9,7 +11,11 @@ import { Pool } from 'pg'
       provide: Pool,
       useValue: pool,
     },
+    {
+      provide: KNEX_CONNECTION,
+      useValue: db
+    }
   ],
-  exports: [Pool],
+  exports: [Pool, KNEX_CONNECTION],
 })
 export class DatabaseModule {}

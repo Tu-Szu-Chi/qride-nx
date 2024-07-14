@@ -1,7 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { SignupPayload, User, UserVO } from '@org/types';
+import { Injectable } from '@nestjs/common';
+import { RegisterDto, User, UserVO } from '@org/types';
 import { UserRepository } from './user.repository';
 import { omit } from 'lodash';
+import { fromDate } from '@org/common';
 
 @Injectable()
 export class UserService {
@@ -15,23 +16,22 @@ export class UserService {
   }
   async getUserInfo(userId: string): Promise<UserVO | undefined> {
     const user = await this.userRepository.findById(userId)
-    return omit(user, ['is_delete', 'created_at', 'updated_at', 'password'])
+    return {
+      ...omit(user, ['is_delete', 'created_at', 'updated_at', 'password', 'birthday']),
+      birthday: user.birthday ? fromDate(user.birthday) : null
+    }
   }
 
   // async findById(id: string): Promise<User | undefined> {
   //   return this.userRepository.findOne({ where: { id } });
   // }
 
-  // async create(createUserDto: SignupPayload): Promise<User> {
-  //   const { phone, password, email } = createUserDto;
-  //   const hashedPassword = await bcrypt.hash(password, 10);
-  //   const user = this.userRepository.create({
-  //     phone,
-  //     password: hashedPassword,
-  //     email,
-  //   });
-  //   return this.userRepository.save(user);
-  // }
+  async create(createUserDto: RegisterDto, hashedPassword: string): Promise<UserVO> {
+    return await this.userRepository.create({
+     ...omit(createUserDto, ['password', 're_password']),
+      password: hashedPassword,
+    });
+  }
 
 //   async setOtp(userId: number, otp: string): Promise<void> {
 //     await this.userRepository.update(userId, { otp });

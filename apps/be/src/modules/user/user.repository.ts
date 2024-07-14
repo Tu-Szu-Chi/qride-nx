@@ -1,17 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Pool, QueryResult } from 'pg';
-import { UserEntity } from '@org/types';
+import { UserDto, UserEntity, UserVO } from '@org/types';
+import { KNEX_CONNECTION } from '../../database.module';
+import { Knex } from 'knex';
+import { omit } from 'lodash';
+import { fromDate } from '@org/common';
 
 @Injectable()
 export class UserRepository {
-  constructor(private readonly pool: Pool) {}
+  constructor(
+    private readonly pool: Pool,
+    @Inject(KNEX_CONNECTION) private readonly knex: Knex
+  ) {}
 
   async findByPhone(phone: string): Promise<UserEntity | null> {
     const query = {
-        text: 'SELECT * FROM users WHERE phone = $1 LIMIT 1',
-        values: [phone],
-      };
-      const result: QueryResult<UserEntity> = await this.pool.query(query);
+      text: 'SELECT * FROM users WHERE phone = $1 LIMIT 1',
+      values: [phone],
+    };
+    const result: QueryResult<UserEntity> = await this.pool.query(query);
     return result.rows[0] || null;
   }
   async findById(id: string): Promise<UserEntity | null> {
@@ -27,13 +34,24 @@ export class UserRepository {
     }
   }
 
-  // async create(user: Partial<User>): Promise<User> {
-  //   const query = {
-  //     text: 'INSERT INTO users(phone, password, first_name, last_name) VALUES($1, $2, $3, $4) RETURNING *',
-  //     values: [user.phone, user.password, user.first_name, user.last_name],
-  //   };
-  //   const { rows } = await this.pool.query(query);
-  //   return rows[0];
-  // }
+  async create(userDto: UserDto): Promise<UserVO> {
+    const userToInsert = Object.fromEntries(
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      Object.entries(userDto).filter(([_, v]) => v !== undefined)
+    );
 
+    const [obj] = await this.knex('users').insert(userToInsert).returning('id');
+
+    const userEntity = await this.findById(obj.id);
+    return {
+      ...omit(userEntity, [
+        'created_at',
+        'updated_at',
+        'is_delete',
+        'password',
+        'birthday'
+      ]),
+      birthday: userEntity.birthday ? fromDate(userEntity.birthday) : null
+    };
+  }
 }

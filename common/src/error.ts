@@ -1,0 +1,1 @@
+export const INVALID_PAYLOAD = 19001
