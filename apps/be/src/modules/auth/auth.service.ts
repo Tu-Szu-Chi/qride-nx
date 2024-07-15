@@ -8,6 +8,7 @@ import { UserService } from '../user/user.service';
 import {
   OtpTypeEnum,
   RegisterDto,
+  ResetPasswordDto,
   User,
   UserSourceType,
   UserType,
@@ -15,9 +16,9 @@ import {
 } from '@org/types';
 
 import * as bcrypt from 'bcrypt';
-import { omit } from 'lodash';
+import { isNull, omit } from 'lodash';
 import axios from 'axios';
-import {  OtpJwtPayload } from './otp.service';
+import { OtpJwtPayload } from './otp.service';
 import {
   INVALID_PAYLOAD,
   alphaMax50Regex,
@@ -31,6 +32,7 @@ type AuthSuccessBO = {
   access_token: string;
   user_id: string;
 };
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -55,7 +57,8 @@ export class AuthService {
     token: string
   ): Promise<AuthSuccessBO & { user: UserVO }> {
     // 1. verify token
-    const { type, verified, phone }: OtpJwtPayload = this.jwtService.verify(token);
+    const { type, verified, phone }: OtpJwtPayload =
+      this.jwtService.verify(token);
     if (
       type != OtpTypeEnum.REGISTER ||
       verified != true ||
@@ -64,15 +67,37 @@ export class AuthService {
       throw new UnauthorizedException();
 
     this.validateRegisterPayload(payload);
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(payload.password, saltRounds);
+
+    const hashedPassword = await this.hashedPassword(payload.password);
     const userVO = await this.userService.create(payload, hashedPassword);
     // 在實際應用中,您需要發送OTP給用戶(例如通過電子郵件或短信)
     return {
       access_token: this.signToken(userVO.phone, userVO.id),
       user_id: userVO.id,
-      user: userVO
+      user: userVO,
     };
+  }
+  async resetPassword(payload: ResetPasswordDto, token: string) {
+    const { type, verified, phone }: OtpJwtPayload =
+      this.jwtService.verify(token);
+    if (
+      type != OtpTypeEnum.RESET_PASSWORD ||
+      verified != true ||
+      !phoneRegex.test(phone)
+    )
+      throw new UnauthorizedException();
+
+    const { password, re_password } = payload;
+    if (password != re_password || !passwordRegex.test(password))
+      throw new BadRequestException('Invalid password');
+
+    const hashedPassword = await this.hashedPassword(payload.password);
+    const userEntity = await this.userService.findOne(phone);
+    if (isNull(userEntity)) throw new BadRequestException('Not found user');
+    await this.userService.updateUser(userEntity.id, {
+      password: hashedPassword,
+    });
+    return true;
   }
   async verifyRecaptcha(recaptchaResponse) {
     const secretKey = 'YOUR_SECRET_KEY';
@@ -145,7 +170,7 @@ export class AuthService {
       !Number.isNaN(source) &&
       !Object.values(UserSourceType).includes(source)
     )
-      throw badRequestGenerator("Invalid source");
+      throw badRequestGenerator('Invalid source');
     if (email != '' && !emailRegex.test(email))
       throw badRequestGenerator('Invalid email');
     // whatsapp
@@ -154,5 +179,9 @@ export class AuthService {
   private signToken(phone: string, id: string): string {
     const payload = { phone: phone, sub: id };
     return this.jwtService.sign(payload);
+  }
+  private async hashedPassword(password: string): Promise<string> {
+    const PasswordSalt = 10;
+    return await bcrypt.hash(password, PasswordSalt);
   }
 }

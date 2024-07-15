@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { RegisterDto, User, UserVO } from '@org/types';
+import { RegisterDto, User, UserEntity, UserUpdateDto, UserVO } from '@org/types';
 import { UserRepository } from './user.repository';
 import { omit } from 'lodash';
 import { fromDate } from '@org/common';
@@ -10,7 +10,7 @@ export class UserService {
     private readonly userRepository: UserRepository
   ) {}
 
-  async findOne(phone: string): Promise<User | undefined> {
+  async findOne(phone: string): Promise<UserEntity> {
       const user = await this.userRepository.findByPhone(phone)
       return user;
   }
@@ -27,10 +27,20 @@ export class UserService {
   // }
 
   async create(createUserDto: RegisterDto, hashedPassword: string): Promise<UserVO> {
-    return await this.userRepository.create({
+    const userEntity = await this.userRepository.create({
      ...omit(createUserDto, ['password', 're_password']),
       password: hashedPassword,
     });
+    return {
+      ...omit(userEntity, [
+        'created_at',
+        'updated_at',
+        'is_delete',
+        'password',
+        'birthday'
+      ]),
+      birthday: userEntity.birthday ? fromDate(userEntity.birthday) : null
+    };
   }
 
 //   async setOtp(userId: number, otp: string): Promise<void> {
@@ -46,8 +56,17 @@ export class UserService {
 //     return false;
 //   }
 
-  // async updateUser(userId: string, updateData: Partial<User>): Promise<User> {
-  //   await this.userRepository.update(userId, updateData);
-  //   return this.findById(userId);
-  // }
+  async updateUser(userId: string, updateData: UserUpdateDto): Promise<UserVO> {
+    const userEntity = await this.userRepository.update(userId, updateData);
+    return {
+      ...omit(userEntity, [
+        'created_at',
+        'updated_at',
+        'is_delete',
+        'password',
+        'birthday'
+      ]),
+      birthday: userEntity.birthday ? fromDate(userEntity.birthday) : null
+    };
+  }
 }

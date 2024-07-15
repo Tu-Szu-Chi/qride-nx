@@ -16,7 +16,13 @@ import {
 } from '@org/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
-import { RegisterDto, LoginDto, SendOtpDto, VerifyOtpDto } from '@org/types';
+import {
+  RegisterDto,
+  LoginDto,
+  SendOtpDto,
+  VerifyOtpDto,
+  ResetPasswordDto,
+} from '@org/types';
 import { OtpService } from './otp.service';
 import { OtpTypeEnum } from '@org/types';
 
@@ -57,6 +63,7 @@ export class AuthController {
   @Post('logout')
   async logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie(ACCESS_TOKEN);
+    res.clearCookie(HEADER_USER_ID)
     return true;
   }
 
@@ -66,7 +73,10 @@ export class AuthController {
     @Headers(HEADER_PRE_TOKEN) preRegisterToken: string,
     @Res({ passthrough: true }) res: Response
   ) {
-    const { access_token, user_id, user } = await this.authService.register(body, preRegisterToken);
+    const { access_token, user_id, user } = await this.authService.register(
+      body,
+      preRegisterToken
+    );
     res.cookie(ACCESS_TOKEN, access_token, {
       httpOnly: true,
       secure: isProd,
@@ -78,12 +88,21 @@ export class AuthController {
       sameSite: 'strict',
       maxAge: oneDay,
     });
-    return user
+    return user;
   }
-  // @Post('reset-password')
-  // async resetPassword() {
+  @Post('reset-password')
+  async resetPassword(
+    @Body() body: ResetPasswordDto,
+    @Headers(HEADER_PRE_TOKEN) preResetToken: string,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const success = await this.authService.resetPassword(body, preResetToken);
+    if (!success) throw new InternalServerErrorException();
+    res.clearCookie(ACCESS_TOKEN);
+    res.clearCookie(HEADER_USER_ID)
 
-  // }
+    return true;
+  }
   @Post('otp/send')
   async sendOtp(@Body() body: SendOtpDto) {
     const { phone, type } = body;

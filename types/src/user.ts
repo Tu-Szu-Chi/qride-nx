@@ -27,6 +27,15 @@ export type UserVO = Omit<User, 'password' | 'birthday'> & {
 export type UserDto = Omit<User, 'id' | 'created_at' | 'updated_at' | 'is_delete' | 'birthday'> & {
   birthday?: string;
 }
+export interface UserUpdateDto {
+  email?: string;
+  password?: string;
+  address_detail?: string
+  birthday?: string;
+  whatsapp?: string;
+  facebook?: string;
+  is_delete?: boolean;
+}
 
 export enum UserType {
   CLIENT = 'client',

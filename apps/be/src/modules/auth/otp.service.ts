@@ -17,6 +17,7 @@ export class OtpService {
   constructor(private jwtService: JwtService) {}
   async generateOtp(phone: string, type: OtpTypeEnum): Promise<string> {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    // !if reset-password, make sure the phone exist in DB
     // await this.otpModel.create({ phoneNumber, otp, type });
     // 在這裡實現發送 OTP 到用戶手機的邏輯
     return otp;

@@ -33,6 +33,10 @@ export interface SendOtpDto {
     otp: string;
     type: OtpTypeEnum;
   }
+  export interface ResetPasswordDto {
+    password: string;
+    re_password: string;
+  }
   export enum OtpTypeEnum {
     REGISTER = 'register',
     RESET_PASSWORD = 'reset-password',
