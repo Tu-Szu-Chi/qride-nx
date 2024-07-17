@@ -26,8 +26,7 @@
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "be:build",
-        "port": 80
+        "buildTarget": "be:build"
       },
       "configurations": {
         "development": {
