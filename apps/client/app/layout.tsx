@@ -24,7 +24,7 @@ export default function RootLayout({
 }
 
 const Wrapper = ({ children } : { children: React.ReactNode }) => {
-  return <div className='px-4 pt-8 pb-20 h-full flex justify-center bg-white'>
+  return <div className='h-full flex justify-center bg-white'>
     {children}
   </div> 
 }

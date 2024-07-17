@@ -10,11 +10,11 @@ type Props = {
 
 const Container = ({ title, step, bottomEle, children }: Props) => {
   return (
-    <div className="w-full flex flex-col h-full flex-1">
-      <Title className='mb-12'>{title}</Title>
+    <div className="w-full py-16 px-12 flex flex-col h-full flex-1 ">
+      <Title className='mb-12 text-left w-32 font-bold text-primary'>{title}</Title>
       <StepIndicator steps={[1,2,3]} currentStep={step} />
       {children}
-      <div className=" mt-auto">{bottomEle}</div>
+      <div className="mt-auto">{bottomEle}</div>
     </div>
   );
 };

@@ -12,8 +12,8 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({ currentStep, steps }) => 
         <React.Fragment key={index}>
           <div className={`
             flex items-center justify-center
-            w-12 h-12 rounded-sm
-            ${index + 1 == currentStep ? 'bg-primary text-white' : 'bg-white text-gray-500 border border-gray-300'}
+            w-10 h-10 rounded-full border-2
+            ${index + 1 == currentStep ? 'border-primary text-primary bg-white' : 'bg-white text-gray-300 border border-gray-300'}
             font-bold text-xl
           `}>
             {index + 1}

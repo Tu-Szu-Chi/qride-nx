@@ -1,17 +1,18 @@
 'use client';
 
+import GradientBackground from '../../components/GradientBackground';
 import { useCallback, useRef, useState } from 'react';
-import Button from '../../components/Button';
-import Container from './Container';
-import { Formik, FormikErrors, Field, ErrorMessage } from 'formik';
-import Link from 'next/link';
 import Step1 from './Setp1';
 import Step2 from './Step2';
 import Step3 from './Step3';
 import Success from './Success';
 
 const SignUp = () => {
-  const [step, handleChangeStep] = useState(4);
+  const [step, handleChangeStep] = useState(1);
+  return <GradientBackground>{getStep(step)}</GradientBackground>;
+};
+
+const getStep = (step: number) => {
   switch (step) {
     case 1:
       return <Step1 />;
@@ -20,7 +21,7 @@ const SignUp = () => {
     case 3:
       return <Step3 />;
     case 4:
-      return <Success />
+      return <Success />;
   }
 };
 

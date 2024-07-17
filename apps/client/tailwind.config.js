@@ -8,11 +8,18 @@ module.exports = {
       extend: {
         colors: {
           primary: {
-            DEFAULT: '#d3445b'
+            DEFAULT: '#D70127'
           },
           blue: {
             DEFAULT: '#6558f5'
+          },
+          gray: {
+            300: '#D9D9D9'
           }
+        },
+        borderRadius: {
+          'xl': '14px',
+          '3xl': '27.5px'
         }
       },
     },

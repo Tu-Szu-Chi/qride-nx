@@ -16,26 +16,21 @@ const Step1 = () => {
   }, [btnRef]);
   return (
     <Container
-      title="Create an Account"
+      title="Create an account"
       step={1}
       bottomEle={
-        <div className="text-center">
-          <Button onClick={handleSubmitClick} className="mb-10">
-            Submit
-          </Button>
-          <p className="text-gray-600 mb-4">Already have an account?</p>
+        <p className="text-white text-center">Already a member?&nbsp;
           <Link href="/sign-in">
-            <span className="text-blue-600 border-b-2 border-blue-100">
-              Sign in to your account
+            <span className="">
+              Log in
             </span>
           </Link>
-        </div>
+          </p>
       }
     >
       <div>
-        <h4 className="w-full text-center mt-20">
-          Add your phone number. We will send you a verification code so we know
-          you&apos;re real.
+        <h4 className="text-primary text-xl mt-20">
+          Mobile Verification
         </h4>
         <Formik
           initialValues={initValue}
@@ -65,16 +60,18 @@ const Step1 = () => {
             isSubmitting,
           }) => (
             <form onSubmit={handleSubmit}>
-              <div className="p-8">
+              <div className="mt-6">
                 <label htmlFor="phone">
-                  <span className="font-bold">Phone Number*</span>
+                  <div className="flex items-center bg-white border-white p-4 rounded-xl border-2 w-full">
+                <img src='assets/phone.svg' alt="phone" />
                   <Field
                     id="phone"
                     name="phone"
-                    placeholder="2341234567890"
+                    placeholder="Mobile Number"
                     type="number"
-                    className="block border-gray-300 p-4 rounded-md border-2 w-full"
+                    className="flex-grow ml-2"
                   />
+                  </div>
                 </label>
                 <ErrorMessage
                   name="phone"
@@ -89,6 +86,13 @@ const Step1 = () => {
           )}
         </Formik>
       </div>
+      <div className="flex justify-between items-center mt-11">
+          <span className='text-xl text-white'>Sign Up</span>
+          <div onClick={handleSubmitClick} className='rounded-full bg-white p-2'>
+            <img src="assets/arrow_right.svg" alt="submit" className='w-8 h-8' />
+          </div>
+          
+        </div>
     </Container>
   );
 };
