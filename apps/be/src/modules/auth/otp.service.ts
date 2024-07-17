@@ -1,6 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { OtpTypeEnum } from '@org/types';
+import { OtpRepository } from './otp.repository';
+import { isEmpty } from 'lodash';
+import { UserService } from '../user/user.service';
 
 const OTP_TTL: Record<OtpTypeEnum, string> = {
   [OtpTypeEnum.REGISTER]: '30m',
@@ -14,11 +17,18 @@ export type OtpJwtPayload = {
 
 @Injectable()
 export class OtpService {
-  constructor(private jwtService: JwtService) {}
+  constructor(private jwtService: JwtService,
+    private readonly otpRepository: OtpRepository,
+    private readonly userService: UserService
+  ) {}
   async generateOtp(phone: string, type: OtpTypeEnum): Promise<string> {
+    if (isEmpty(phone)) throw new InternalServerErrorException('Invalid phone');
+    if (OtpTypeEnum.RESET_PASSWORD == type) {
+        const user = await this.userService.findOne(phone);
+        if (isEmpty(user)) throw new InternalServerErrorException('Invalid phone');
+    }
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    // !if reset-password, make sure the phone exist in DB
-    // await this.otpModel.create({ phoneNumber, otp, type });
+    await this.otpRepository.create({ phone, type, otp })
     // 在這裡實現發送 OTP 到用戶手機的邏輯
     return otp;
   }
@@ -28,12 +38,12 @@ export class OtpService {
     otp: string,
     type: OtpTypeEnum
   ): Promise<string> {
-    // const otpRecord = await this.otpModel.findOne({ phoneNumber, otp }).exec();
-    // if (otpRecord) {
-    //   await this.otpModel.deleteOne({ phoneNumber, otp }).exec();
-    //   return true;
-    // }
-    // return false;
+    const otpEntity = await this.otpRepository.findOne(phone, otp, type);
+    if (isEmpty(otpEntity)) {
+      throw new BadRequestException("Invalid code")
+    }
+    this.otpRepository.verify(phone)
+
     return this.jwtService.sign(
       { phone, verified: true, type },
       { expiresIn: OTP_TTL[type] }
