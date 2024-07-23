@@ -8,13 +8,15 @@ module.exports = {
       extend: {
         colors: {
           primary: {
-            DEFAULT: '#D70127'
+            DEFAULT: '#D70127',
+            500: '#A8001E'
           },
           blue: {
             DEFAULT: '#6558f5'
           },
           gray: {
-            300: '#D9D9D9'
+            300: '#D9D9D9',
+            500: '#555555'
           }
         },
         borderRadius: {

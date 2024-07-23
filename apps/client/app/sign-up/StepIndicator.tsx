@@ -12,14 +12,18 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({ currentStep, steps }) => 
         <React.Fragment key={index}>
           <div className={`
             flex items-center justify-center
-            w-10 h-10 rounded-full border-2
-            ${index + 1 == currentStep ? 'border-primary text-primary bg-white' : 'bg-white text-gray-300 border border-gray-300'}
+            w-6 h-6 rounded-full border-2 text-xs
+            ${step < currentStep ? 'bg-primary ' : 'bg-white'}
+            ${step <= currentStep ? 'border-primary text-primary ' : 'text-gray-300 border border-gray-300'}
             font-bold text-xl
           `}>
-            {index + 1}
+            {(step < currentStep) ? <img src='/assets/checked.svg' alt='Checked' /> : index + 1}
           </div>
-          {index < steps.length - 1 && (
-            <div className="flex-grow h-px bg-gray-300 mx-2"></div>
+          {step < steps.length && (
+            <div className={`
+              flex-grow h-1  
+              ${step < currentStep ? 'bg-primary' : 'bg-gray-300'}
+            `}></div>
           )}
         </React.Fragment>
       ))}

@@ -5,9 +5,9 @@ import { Formik, FormikErrors, Field, ErrorMessage } from 'formik';
 import Link from 'next/link';
 
 interface FormData {
-    phone: string;
-  }
-  
+  phone: string;
+}
+
 const Step1 = () => {
   const btnRef = useRef<HTMLButtonElement>(null);
   const initValue: FormData = { phone: '' };
@@ -19,19 +19,16 @@ const Step1 = () => {
       title="Create an account"
       step={1}
       bottomEle={
-        <p className="text-white text-center">Already a member?&nbsp;
+        <p className="text-white text-center">
+          Already a member?&nbsp;
           <Link href="/sign-in">
-            <span className="">
-              Log in
-            </span>
+            <span className="">Log in</span>
           </Link>
-          </p>
+        </p>
       }
     >
       <div>
-        <h4 className="text-primary text-xl mt-20">
-          Mobile Verification
-        </h4>
+        <h4 className="text-primary text-xl mt-20">Mobile Verification</h4>
         <Formik
           initialValues={initValue}
           validate={(values) => {
@@ -63,14 +60,14 @@ const Step1 = () => {
               <div className="mt-6">
                 <label htmlFor="phone">
                   <div className="flex items-center bg-white border-white p-4 rounded-xl border-2 w-full">
-                <img src='assets/phone.svg' alt="phone" />
-                  <Field
-                    id="phone"
-                    name="phone"
-                    placeholder="Mobile Number"
-                    type="number"
-                    className="flex-grow ml-2"
-                  />
+                    <img src="assets/phone.svg" alt="phone" />
+                    <Field
+                      id="phone"
+                      name="phone"
+                      placeholder="Mobile Number"
+                      type="number"
+                      className="flex-grow ml-2"
+                    />
                   </div>
                 </label>
                 <ErrorMessage
@@ -87,12 +84,11 @@ const Step1 = () => {
         </Formik>
       </div>
       <div className="flex justify-between items-center mt-11">
-          <span className='text-xl text-white'>Sign Up</span>
-          <div onClick={handleSubmitClick} className='rounded-full bg-white p-2'>
-            <img src="assets/arrow_right.svg" alt="submit" className='w-8 h-8' />
-          </div>
-          
+        <span className="text-xl text-white">Sign Up</span>
+        <div onClick={handleSubmitClick} className="rounded-full bg-white p-2">
+          <img src="assets/arrow_right.svg" alt="submit" className="w-8 h-8" />
         </div>
+      </div>
     </Container>
   );
 };

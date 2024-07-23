@@ -8,15 +8,12 @@ const Success = () => {
   const handleSubmit = () => {};
 
   return (
-    <div className="w-full flex flex-col h-full flex-1">
-      <Title className="mb-12">Welcome to QRide!</Title>
-      <div className='flex justify-center flex-col items-center'>
-        <div className="w-10/12 h-60 bg-gray-600"></div>
-        <h4 className=' mt-20'>Your account has been activated!</h4>
-      </div>
-      <div className="mt-auto">
-        <Button>Maintain My Product Now</Button>
-        <Button theme="transparent">Skip</Button>
+    <div className="w-full py-16 px-12 flex flex-col h-full flex-1">
+      <Title className='mb-40 text-left w-33 pr-28 font-bold text-primary'>Welcome to the Club</Title>
+      <h4 className='text-primary text-xl'>Account activated</h4>
+      <div className='mt-auto'>
+        <Button>Register My Products Now</Button>
+        <Button theme='transparent' className='text-white'>Skip</Button>
       </div>
     </div>
   );
