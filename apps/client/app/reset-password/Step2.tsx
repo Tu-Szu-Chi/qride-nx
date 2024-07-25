@@ -1,4 +1,4 @@
-import React, {  useState } from 'react';
+import React, { useState } from 'react';
 import Container from './Container';
 
 const Step2 = () => {
@@ -22,12 +22,26 @@ const Step2 = () => {
 
   return (
     <Container
-      title="Create an account"
-      step={2}
+      title="OTP Verification"
+      bottomEle={
+        <div className="flex justify-between items-center mt-auto">
+          <span className="text-xl text-white">Next</span>
+          <div onClick={handleSubmit} className="rounded-full bg-white p-2">
+            <img
+              src="assets/arrow_right.svg"
+              alt="submit"
+              className="w-8 h-8"
+            />
+          </div>
+        </div>
+      }
     >
-      <div>
-        <h4 className="text-primary text-xl mt-20">Enter OTP</h4>
-        <div className="flex justify-between items-center mt-6">
+      <div className='mt-auto'>
+        <h4 className="text-primary text-sm mb-6 text-center">
+          Please enter the 4-digit OTP (One-Time Password) sent to your
+          registered mobile number.
+        </h4>
+        <div className="flex justify-between items-center">
           {otp.map((data, index) => (
             <input
               className="flex items-center justify-center
@@ -44,13 +58,11 @@ const Step2 = () => {
             />
           ))}
         </div>
-        <h4 className='text-center text-gray-500 mt-6'>Didn&apos;t receive code?<br />Resend in 60s</h4>
-      </div>
-      <div className="flex justify-between items-center mt-auto">
-        <span className="text-xl text-white">Next</span>
-        <div onClick={handleSubmit} className="rounded-full bg-white p-2">
-          <img src="assets/arrow_right.svg" alt="submit" className="w-8 h-8" />
-        </div>
+        <h4 className="text-center text-gray-500 mt-6">
+          Didn&apos;t receive code?
+          <br />
+          Resend in 60s
+        </h4>
       </div>
     </Container>
   );

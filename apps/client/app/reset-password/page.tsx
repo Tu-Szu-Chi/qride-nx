@@ -1,16 +1,21 @@
 'use client';
 
+
+import { useState } from 'react';
 import GradientBackground from '../../components/GradientBackground';
-import { useCallback, useRef, useState } from 'react';
-import Step1 from './Setp1';
+import Step1 from './Step1';
 import Step2 from './Step2';
 import Step3 from './Step3';
-import Success from './Success';
 
-const SignUp = () => {
+export default function SignUp() {
   const [step, handleChangeStep] = useState(3);
-  return <GradientBackground>{getStep(step)}</GradientBackground>;
-};
+
+  return (
+    <GradientBackground>
+      {getStep(step)}
+    </GradientBackground>
+  );
+}
 
 const getStep = (step: number) => {
   switch (step) {
@@ -20,9 +25,5 @@ const getStep = (step: number) => {
       return <Step2 />;
     case 3:
       return <Step3 />;
-    case 4:
-      return <Success />;
   }
 };
-
-export default SignUp;
