@@ -2,6 +2,7 @@
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { composePlugins, withNx } = require('@nx/next');
+const path = require('path');
 
 /**
  * @type {import('@nx/next/plugins/with-nx').WithNxOptions}
@@ -11,6 +12,11 @@ const nextConfig = {
     // Set this to true if you would like to to use SVGR
     // See: https://github.com/gregberge/svgr
     svgr: false,
+  },
+  webpack: (config) => {
+    config.resolve.alias['$'] = path.join(__dirname, 'apps/client');
+    config.resolve.alias['@org'] = path.join(__dirname, '');
+    return config;
   },
 };
 

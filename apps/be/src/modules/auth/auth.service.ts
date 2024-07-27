@@ -77,9 +77,14 @@ export class AuthService {
       user: userVO,
     };
   }
+  async isPhoneExist(phone: string): Promise<boolean> {
+    const userEntity = await this.userService.findOne(phone)
+    return !isNull(userEntity)
+  }
   async resetPassword(payload: ResetPasswordDto, token: string) {
     const { type, verified, phone }: OtpJwtPayload =
       this.jwtService.verify(token);
+      
     if (
       type != OtpTypeEnum.RESET_PASSWORD ||
       verified != true ||
@@ -88,8 +93,9 @@ export class AuthService {
       throw new UnauthorizedException();
 
     const { password, re_password } = payload;
-    if (password != re_password || !passwordRegex.test(password))
+    if (password != re_password || !passwordRegex.test(password)) {
       throw new BadRequestException('Invalid password');
+    }
 
     const hashedPassword = await this.hashedPassword(payload.password);
     const userEntity = await this.userService.findOne(phone);
@@ -121,6 +127,7 @@ export class AuthService {
     password: string
   ): Promise<Partial<User> | undefined> {
     const user = await this.userService.findOne(phone);
+ 
     if (user && (await bcrypt.compare(password, user.password))) {
       return omit(user, 'password');
     }

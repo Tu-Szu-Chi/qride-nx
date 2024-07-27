@@ -14,14 +14,14 @@ export class UserRepository {
 
   async findByPhone(phone: string): Promise<UserEntity | null> {
     const query = {
-      text: 'SELECT * FROM users WHERE phone = $1 AND is_delete = 0 LIMIT 1',
+      text: 'SELECT * FROM users WHERE phone = $1 AND is_delete = false LIMIT 1',
       values: [phone],
     };
     const result: QueryResult<UserEntity> = await this.pool.query(query);
     return result.rows[0] || null;
   }
   async findById(id: string): Promise<UserEntity | null> {
-    const query = 'SELECT * FROM users WHERE id = $1 AND is_delete = 0';
+    const query = 'SELECT * FROM users WHERE id = $1 AND is_delete = false';
     const values = [id];
 
     try {
