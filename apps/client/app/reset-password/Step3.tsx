@@ -4,11 +4,14 @@ import { Formik, FormikErrors, Field, ErrorMessage } from 'formik';
 import Container from './Container';
 import Button from '../../components/Button';
 import * as Yup from 'yup';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
+import api from '$/utils/fetch';
+import { ResetPasswordDto } from '@org/types/src';
+import { CODE_SUCCESS, HEADER_PRE_TOKEN } from '@org/common/src';
+import { useRouter } from 'next/navigation';
+import { usePayload } from './PayloadContext';
 
 const FormSchema = Yup.object().shape({
-  //password
-  //rePassword
   password: Yup.string().max(50, 'Too Long').required('Required'),
   rePassword: Yup.string().max(50, 'Too Long').required('Required'),
 });
@@ -19,30 +22,41 @@ interface FormData {
 }
 const DEFAULT_INPUT_STYLES =
   'flex items-center justify-between bg-white border-white p-4 rounded-xl border-2 w-full';
+
 const Step3 = () => {
   const initValue: FormData = { password: '', rePassword: '' };
+  const router = useRouter();
+  const { token } = usePayload();
   const [showPassword, togglePassword] = useState(false);
   const [showRePassword, toggleRePassword] = useState(false);
 
   return (
-    <Container
-      title="Set new password"
-      bottomEle={
-        <div className="flex justify-end items-center mt-auto">
-          <Button theme="dark" style={{ width: '85px' }}>
-            Save
-          </Button>
-        </div>
-      }
-    >
+    <Container title="Set new password">
       <Formik
         initialValues={initValue}
         validationSchema={FormSchema}
-        onSubmit={(values, { setSubmitting }) => {
-          setTimeout(() => {
-            alert(JSON.stringify(values, null, 2));
-            setSubmitting(false);
-          }, 400);
+        onSubmit={(values, { setSubmitting, setFieldError }) => {
+          const payload: ResetPasswordDto = {
+            password: values.password,
+            re_password: values.rePassword,
+          };
+          setSubmitting(true);
+          api
+            .post('/auth/reset-password', payload, {
+              headers: {
+                [HEADER_PRE_TOKEN]: token,
+              },
+            })
+            .then((res) => {
+              if (res.bizCode == CODE_SUCCESS) {
+                // show success
+                router.push('/');
+              } else {
+                console.log(res.data?.error?.message);
+                setFieldError('password', res.data?.error?.message);
+              }
+            })
+            .finally(() => setSubmitting(false));
         }}
       >
         {({
@@ -54,50 +68,61 @@ const Step3 = () => {
           handleSubmit,
           isSubmitting,
         }) => (
-          <div className="mt-auto">
-            <form onSubmit={handleSubmit}>
-              <label htmlFor="password">
-                <div className={`${DEFAULT_INPUT_STYLES} mb-6`}>
-                  <Field
-                    id="password"
-                    name="password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Password"
-                  />
-                  <img
-                    src="assets/eye.svg"
-                    alt="hidden"
-                    onClick={() => togglePassword((pre) => !pre)}
-                  />
-                </div>
-              </label>
-              <ErrorMessage
-                name="password"
-                className="text-red-500"
-                component="span"
-              />
-              <label htmlFor="rePassword">
-                <div className={`${DEFAULT_INPUT_STYLES}`}>
-                  <Field
-                    id="rePassword"
-                    name="rePassword"
-                    type={showRePassword ? 'text' : 'password'}
-                    placeholder="Confirm new password"
-                  />
-                  <img
-                    src="assets/eye.svg"
-                    alt="hidden"
-                    onClick={() => toggleRePassword((pre) => !pre)}
-                  />
-                </div>
-              </label>
-              <ErrorMessage
-                name="rePassword"
-                className="text-red-500"
-                component="span"
-              />
-            </form>
-          </div>
+          <Fragment>
+            <div className="mt-auto">
+              <form>
+                <label htmlFor="password">
+                  <div className={`${DEFAULT_INPUT_STYLES} mb-6 relative`}>
+                    <Field
+                      id="password"
+                      name="password"
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="Password"
+                    />
+                    <img
+                      src="assets/eye.svg"
+                      alt="hidden"
+                      onClick={() => togglePassword((pre) => !pre)}
+                    />
+                    <ErrorMessage
+                      name="password"
+                      className="text-red-500 absolute top-full w-full left-0"
+                      component="span"
+                    />
+                  </div>
+                </label>
+                <label htmlFor="rePassword">
+                  <div className={`${DEFAULT_INPUT_STYLES}`}>
+                    <Field
+                      id="rePassword"
+                      name="rePassword"
+                      type={showRePassword ? 'text' : 'password'}
+                      placeholder="Confirm new password"
+                    />
+                    <img
+                      src="assets/eye.svg"
+                      alt="hidden"
+                      onClick={() => toggleRePassword((pre) => !pre)}
+                    />
+                  </div>
+                </label>
+                <ErrorMessage
+                  name="rePassword"
+                  className="text-red-500"
+                  component="span"
+                />
+              </form>
+            </div>
+            <div className="flex justify-end items-center mt-auto">
+              <Button
+                theme="dark"
+                style={{ width: '85px' }}
+                onClick={() => handleSubmit()}
+              >
+                Save
+              </Button>
+            </div>
+          </Fragment>
         )}
       </Formik>
     </Container>

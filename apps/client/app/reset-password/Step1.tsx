@@ -1,29 +1,23 @@
 'use client';
 
 import { Formik, FormikErrors, Field, ErrorMessage } from 'formik';
-import Title from '../../components/Title';
 import Container from './Container';
+import api from '$/utils/fetch';
+import { OtpTypeEnum, SendOtpDto } from '@org/types/src';
+import { CODE_SUCCESS } from '@org/common/src';
+import { usePayload } from './PayloadContext';
+import { Fragment } from 'react';
 interface FormData {
   phone: string;
 }
-const Step1 = () => {
+type Props = {
+  onSuccess: () => void;
+};
+const Step1 = (props: Props) => {
   const initValue: FormData = { phone: '' };
+  const { setPhone } = usePayload();
   return (
-    <Container
-      title="Forgot password?"
-      bottomEle={
-        <div className="flex justify-between items-center mt-auto">
-          <span className="text-xl text-white">Send</span>
-          <div className="rounded-full bg-white p-2">
-            <img
-              src="assets/arrow_right.svg"
-              alt="submit"
-              className="w-8 h-8"
-            />
-          </div>
-        </div>
-      }
-    >
+    <Container title="Forgot password?">
       <Formik
         initialValues={initValue}
         validate={(values) => {
@@ -35,11 +29,25 @@ const Step1 = () => {
           }
           return errors;
         }}
-        onSubmit={(values, { setSubmitting }) => {
-          setTimeout(() => {
-            alert(JSON.stringify(values, null, 2));
-            setSubmitting(false);
-          }, 400);
+        onSubmit={(values, { setSubmitting, setFieldError }) => {
+          setSubmitting(true);
+          const phone = String(values.phone);
+          const payload: SendOtpDto = {
+            phone,
+            type: OtpTypeEnum.RESET_PASSWORD,
+          };
+          api
+            .post('/auth/otp/send', payload)
+            .then((res) => {
+              if (res.bizCode == CODE_SUCCESS) {
+                setPhone(phone);
+                props.onSuccess();
+              } else {
+                //! alert
+                setFieldError('phone', res.data?.error?.message);
+              }
+            })
+            .finally(() => setSubmitting(false));
         }}
       >
         {({
@@ -51,28 +59,42 @@ const Step1 = () => {
           handleSubmit,
           isSubmitting,
         }) => (
-          <div className="mt-auto">
-            <form onSubmit={handleSubmit}>
-              <h4 className="text-primary text-xl mb-6">Mobile Verification</h4>
-              <label htmlFor="phone" className="block">
-                <div className="flex items-center bg-white border-white p-4 rounded-xl border-2 w-full">
-                  <img src="assets/phone.svg" alt="phone" />
-                  <Field
-                    id="phone"
-                    name="phone"
-                    placeholder="Mobile Number"
-                    type="number"
-                    className="flex-grow ml-2"
-                  />
-                </div>
-              </label>
-              <ErrorMessage
-                name="phone"
-                className="text-red-500"
-                component="span"
-              />
-            </form>
-          </div>
+          <Fragment>
+            <div className="mt-auto">
+              <form>
+                <h4 className="text-primary text-xl mb-6">
+                  Mobile Verification
+                </h4>
+                <label htmlFor="phone" className="block">
+                  <div className="flex items-center bg-white border-white p-4 rounded-xl border-2 w-full">
+                    <img src="assets/phone.svg" alt="phone" />
+                    <Field
+                      id="phone"
+                      name="phone"
+                      placeholder="Mobile Number"
+                      type="number"
+                      className="flex-grow ml-2"
+                    />
+                  </div>
+                </label>
+                <ErrorMessage
+                  name="phone"
+                  className="text-red-500"
+                  component="span"
+                />
+              </form>
+            </div>
+            <div className="flex justify-between items-center mt-auto">
+              <span className="text-xl text-white">Send</span>
+              <div className="rounded-full bg-white p-2" onClick={() => handleSubmit()}>
+                <img
+                  src="assets/arrow_right.svg"
+                  alt="submit"
+                  className="w-8 h-8"
+                />
+              </div>
+            </div>
+          </Fragment>
         )}
       </Formik>
     </Container>

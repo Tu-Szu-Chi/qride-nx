@@ -2,7 +2,7 @@ import React, {  useState } from 'react';
 import Container from './Container';
 import api from '$/utils/fetch';
 import { OtpTypeEnum } from '@org/types/src';
-import { usePhone } from './PhoneContext';
+import { usePayload } from './PayloadContext';
 import { CODE_SUCCESS } from '@org/common/src';
 
 type Props = {
@@ -11,7 +11,7 @@ type Props = {
 
 const Step2 = (props: Props) => {
   const [otp, setOtp] = useState<string[]>(new Array(4).fill(''));
-  const { phone } = usePhone()
+  const { phone, setToken } = usePayload()
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     index: number
@@ -33,7 +33,10 @@ const Step2 = (props: Props) => {
       code: otp.join(''),
       type: OtpTypeEnum.REGISTER
     }).then(res => {
-      if (res.bizCode == CODE_SUCCESS) props.onSuccess()
+      if (res.bizCode == CODE_SUCCESS) {
+        setToken(res.data)
+        props.onSuccess()
+      } 
         else {
       // show error message
       }

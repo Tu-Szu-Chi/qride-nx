@@ -6,7 +6,7 @@ import Step1 from './Setp1';
 import Step2 from './Step2';
 import Step3 from './Step3';
 import Success from './Success';
-import { PhoneProvider } from './PhoneContext';
+import { PayloadProvider } from './PayloadContext';
 
 const SignUp = () => {
   const [step, handleChangeStep] = useState(1);
@@ -20,14 +20,14 @@ const SignUp = () => {
       case 2:
         return <Step2 onSuccess={goNextStep} />;
       case 3:
-        return <Step3 />;
+        return <Step3 onSuccess={goNextStep} />;
       case 4:
         return <Success />;
     }
   }, [step, goNextStep])
-  return <PhoneProvider>
+  return <PayloadProvider>
     <GradientBackground>{children}</GradientBackground>
-  </PhoneProvider>;
+  </PayloadProvider>;
 };
 
 

@@ -1,8 +1,17 @@
 import React, { useState } from 'react';
 import Container from './Container';
+import api from '$/utils/fetch';
+import { OtpTypeEnum, VerifyOtpDto } from '@org/types/src';
+import { usePayload } from './PayloadContext';
+import { CODE_SUCCESS } from '@org/common/src';
 
-const Step2 = () => {
+type Props = {
+  onSuccess: () => void
+}
+
+const Step2 = (props: Props) => {
   const [otp, setOtp] = useState<string[]>(new Array(4).fill(''));
+  const { phone, setToken } = usePayload()
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     index: number
@@ -18,7 +27,22 @@ const Step2 = () => {
       (e.target.nextSibling as HTMLInputElement).focus();
     }
   };
-  const handleSubmit = () => {};
+  const handleSubmit = () => {
+    const payload: VerifyOtpDto = {
+      phone: phone || 'None',
+      code: otp.join(''),
+      type: OtpTypeEnum.RESET_PASSWORD
+    }
+    api.post('/auth/otp/verify', payload)
+      .then(res => {
+        if (res.bizCode == CODE_SUCCESS) {
+          setToken(res.data)
+          props.onSuccess()
+        } else {
+          // ! alert
+        }
+      })
+  };
 
   return (
     <Container

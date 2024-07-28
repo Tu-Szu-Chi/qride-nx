@@ -90,7 +90,10 @@ export class AuthController {
       sameSite: 'strict',
       maxAge: oneDay,
     });
-    return user;
+    return {
+      bizCode: CODE_SUCCESS,
+      data: user
+    };
   }
   @Post('reset-password')
   async resetPassword(
@@ -98,12 +101,15 @@ export class AuthController {
     @Headers(HEADER_PRE_TOKEN) preResetToken: string,
     @Res({ passthrough: true }) res: Response
   ) {
-    const success = await this.authService.resetPassword(body, preResetToken);
-    if (!success) throw new InternalServerErrorException();
+    const result = await this.authService.resetPassword(body, preResetToken);
+    if (result.data != true) return result;
     res.clearCookie(ACCESS_TOKEN);
     res.clearCookie(HEADER_USER_ID)
 
-    return true;
+    return {
+      bizCode: CODE_SUCCESS,
+      data: true
+    };
   }
   @Post('otp/send')
   async sendOtp(@Body() body: SendOtpDto) {

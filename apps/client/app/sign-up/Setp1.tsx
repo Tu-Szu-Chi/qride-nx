@@ -5,7 +5,7 @@ import Link from 'next/link';
 import api from '$/utils/fetch';
 import { OtpTypeEnum } from '@org/types/src';
 import { CODE_SUCCESS } from '@org/common/src';
-import { usePhone } from './PhoneContext';
+import { usePayload } from './PayloadContext';
 
 interface FormData {
   phone: string;
@@ -16,7 +16,7 @@ type Props = {
 
 const Step1 = (props: Props) => {
   const btnRef = useRef<HTMLButtonElement>(null);
-  const { setPhone } = usePhone()
+  const { setPhone } = usePayload()
   const initValue: FormData = { phone: '' };
   const handleSubmitClick = useCallback(() => {
     btnRef.current?.click();
