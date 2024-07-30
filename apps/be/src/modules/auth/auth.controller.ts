@@ -11,8 +11,11 @@ import {
 import {
   ACCESS_TOKEN,
   CAPTCHA_KEY,
+  CODE_SUCCESS,
   HEADER_PRE_TOKEN,
   HEADER_USER_ID,
+  INVALID,
+  phoneRegex,
 } from '@org/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
@@ -47,7 +50,6 @@ export class AuthController {
       body.password
     );
     res.cookie(ACCESS_TOKEN, access_token, {
-      httpOnly: true,
       secure: isProd,
       sameSite: 'strict',
       maxAge: oneDay,
@@ -88,7 +90,10 @@ export class AuthController {
       sameSite: 'strict',
       maxAge: oneDay,
     });
-    return user;
+    return {
+      bizCode: CODE_SUCCESS,
+      data: user
+    };
   }
   @Post('reset-password')
   async resetPassword(
@@ -96,36 +101,62 @@ export class AuthController {
     @Headers(HEADER_PRE_TOKEN) preResetToken: string,
     @Res({ passthrough: true }) res: Response
   ) {
-    const success = await this.authService.resetPassword(body, preResetToken);
-    if (!success) throw new InternalServerErrorException();
+    const result = await this.authService.resetPassword(body, preResetToken);
+    if (result.data != true) return result;
     res.clearCookie(ACCESS_TOKEN);
     res.clearCookie(HEADER_USER_ID)
 
-    return true;
+    return {
+      bizCode: CODE_SUCCESS,
+      data: true
+    };
   }
   @Post('otp/send')
   async sendOtp(@Body() body: SendOtpDto) {
     const { phone, type } = body;
-    if (!Object.values(OtpTypeEnum).includes(type))
+    if (!Object.values(OtpTypeEnum).includes(type) ||
+   !phoneRegex.test(phone))
       throw new BadRequestException();
 
-    // ! Verify the phone format
-    const recaptcha = body[CAPTCHA_KEY];
-    if (await this.authService.verifyRecaptcha(recaptcha)) {
+      //! Avoid IP attack (rate-limit)
+    // const recaptcha = body[CAPTCHA_KEY];
+    // const verified = await this.authService.verifyRecaptcha(recaptcha)
+    const verified = true
+    if (verified) {
+      if (type == OtpTypeEnum.REGISTER) {
+        const registerBefore = await this.authService.isPhoneExist(phone)
+        if (registerBefore) return {
+          bizCode: INVALID,
+          message: 'Invalid phone number'
+        }
+
+      }
       return this.otpService
         .generateOtp(phone, type)
-        .then(() => true)
-        .catch(() => new InternalServerErrorException());
+        .then(() => ({
+          bizCode: CODE_SUCCESS,
+          data: true
+        }))
+        .catch((err) => {
+          console.error(err)
+          throw new InternalServerErrorException()
+        });
     }
     throw new UnauthorizedException();
   }
 
   @Post('otp/verify')
   async verifyOtp(@Body() body: VerifyOtpDto) {
-    const { phone, otp, type } = body;
+    const { phone, code, type } = body;
     return this.otpService
-      .verifyOtp(phone, otp, type)
-      .then((token) => ({ token }))
-      .catch(() => new BadRequestException());
+      .verifyOtp(phone, code, type)
+      .then((token) => ({ bizCode: CODE_SUCCESS, data: token }))
+      .catch((err) => {
+        console.error(err)
+        return {
+          bizCode: INVALID,
+          message: 'Invalid code'
+        }
+      });
   }
 }

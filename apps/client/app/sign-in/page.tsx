@@ -1,10 +1,11 @@
 'use client';
 
-import Button from '../../components/Button';
 import { Formik, FormikErrors, Field, ErrorMessage } from 'formik';
 import Link from 'next/link';
 import Title from '../../components/Title';
 import GradientBackground from '../../../client/components/GradientBackground';
+import API from '$/utils/fetch';
+import { FormEvent, Fragment, useEffect, useRef } from 'react';
 
 interface FormData {
   phone: string;
@@ -32,10 +33,14 @@ export default function SignUp() {
             return errors;
           }}
           onSubmit={(values, { setSubmitting }) => {
-            setTimeout(() => {
-              alert(JSON.stringify(values, null, 2));
-              setSubmitting(false);
-            }, 400);
+            API.post('auth/login', {
+              phone: String(values.phone),
+              password: values.password,
+            }).then((res) => {
+              console.log(res);
+            }).catch(err => {
+              console.log(err)
+            })
           }}
         >
           {({
@@ -47,7 +52,7 @@ export default function SignUp() {
             handleSubmit,
             isSubmitting,
           }) => (
-            <form onSubmit={handleSubmit}>
+            <Fragment>
               <div className="space-y-8 p-2">
                 <label htmlFor="phone" className="block">
                   <div className="flex items-center bg-white border-white p-4 rounded-xl border-2 w-full">
@@ -91,22 +96,25 @@ export default function SignUp() {
                   </Link>
                 </div>
               </div>
-            </form>
+              <div className="flex justify-between items-center mt-auto">
+                <span className="text-xl text-white">Sign In</span>
+                <div
+                  className="rounded-full bg-white p-2"
+                  onClick={() => handleSubmit()}
+                >
+                  <img
+                    src="assets/arrow_right.svg"
+                    alt="submit"
+                    className="w-8 h-8"
+                  />
+                </div>
+              </div>
+            </Fragment>
           )}
         </Formik>
-        <div className="flex justify-between items-center mt-auto">
-          <span className="text-xl text-white">Sign In</span>
-          <div className="rounded-full bg-white p-2">
-            <img
-              src="assets/arrow_right.svg"
-              alt="submit"
-              className="w-8 h-8"
-            />
-          </div>
-        </div>
-          <Link href="/sign-up" className='text-center mt-8 text-gray-500'>
+        <Link href="/sign-up" className="text-center mt-8 text-gray-500">
           <h4>Don&apos;t have account? Sign up</h4>
-          </Link>
+        </Link>
       </div>
     </GradientBackground>
   );

@@ -20,6 +20,7 @@ import { isNull, omit } from 'lodash';
 import axios from 'axios';
 import { OtpJwtPayload } from './otp.service';
 import {
+  CODE_SUCCESS,
   INVALID_PAYLOAD,
   alphaMax50Regex,
   birthdayRegex,
@@ -77,9 +78,14 @@ export class AuthService {
       user: userVO,
     };
   }
+  async isPhoneExist(phone: string): Promise<boolean> {
+    const userEntity = await this.userService.findOne(phone)
+    return !isNull(userEntity)
+  }
   async resetPassword(payload: ResetPasswordDto, token: string) {
     const { type, verified, phone }: OtpJwtPayload =
       this.jwtService.verify(token);
+      
     if (
       type != OtpTypeEnum.RESET_PASSWORD ||
       verified != true ||
@@ -88,8 +94,9 @@ export class AuthService {
       throw new UnauthorizedException();
 
     const { password, re_password } = payload;
-    if (password != re_password || !passwordRegex.test(password))
-      throw new BadRequestException('Invalid password');
+    if (password != re_password || !passwordRegex.test(password)) {
+      return { bizCode: INVALID_PAYLOAD, data: { error: { type: 'password', message: 'Invalid Password'} }}
+    }
 
     const hashedPassword = await this.hashedPassword(payload.password);
     const userEntity = await this.userService.findOne(phone);
@@ -97,7 +104,10 @@ export class AuthService {
     await this.userService.updateUser(userEntity.id, {
       password: hashedPassword,
     });
-    return true;
+    return {
+      bizCode: CODE_SUCCESS,
+      data: true
+    };
   }
   async verifyRecaptcha(recaptchaResponse) {
     const secretKey = 'YOUR_SECRET_KEY';
@@ -121,6 +131,7 @@ export class AuthService {
     password: string
   ): Promise<Partial<User> | undefined> {
     const user = await this.userService.findOne(phone);
+ 
     if (user && (await bcrypt.compare(password, user.password))) {
       return omit(user, 'password');
     }
@@ -144,35 +155,36 @@ export class AuthService {
       whatsapp = '',
       facebook = '',
     } = payload;
-    const badRequestGenerator = (message: string = '') =>
-      new BadRequestException({ bizCode: INVALID_PAYLOAD, message });
+    const badRequestGenerator = (message: string = '', type: string) =>
+      new BadRequestException({ bizCode: INVALID_PAYLOAD, data: { error: {type, message}} });
     // 1. validate phone format
-    if (!phoneRegex.test(phone)) throw badRequestGenerator('Invalid phone');
-    if (!Object.values(UserType).includes(type)) throw badRequestGenerator();
+    if (!phoneRegex.test(phone)) throw badRequestGenerator('Invalid phone', 'phone');
+    if (!Object.values(UserType).includes(type)) throw badRequestGenerator('Invalid user-type', 'type');
     if (!passwordRegex.test(password))
-      throw badRequestGenerator('Invalid password');
-    if (password != re_password) throw badRequestGenerator();
+      throw badRequestGenerator('Invalid password', 'password');
+    if (password != re_password) throw badRequestGenerator('Unconfirmed password', 're_password');
+    // ! need improvement
     if (
       !alphaMax50Regex.test(first_name) ||
       !alphaMax50Regex.test(last_name) ||
       (mid_name != '' && !alphaMax50Regex.test(mid_name))
     )
-      throw badRequestGenerator('Invalid name');
+      throw badRequestGenerator('Invalid name', 'first_name');
     if (
       !alphaMax50Regex.test(address_city) ||
       !alphaMax50Regex.test(address_state) ||
       (address_detail != '' && !alphaMax50Regex.test(address_detail))
     )
-      throw badRequestGenerator('Invalid address');
+      throw badRequestGenerator('Invalid address', 'address_city');
     if (birthday != '' && !birthdayRegex.test(birthday))
-      throw badRequestGenerator('Invalid birthday');
+      throw badRequestGenerator('Invalid birthday', 'birthday');
     if (
       !Number.isNaN(source) &&
       !Object.values(UserSourceType).includes(source)
     )
-      throw badRequestGenerator('Invalid source');
+      throw badRequestGenerator('Invalid source', 'source');
     if (email != '' && !emailRegex.test(email))
-      throw badRequestGenerator('Invalid email');
+      throw badRequestGenerator('Invalid email', 'email');
     // whatsapp
     // facebook
   }

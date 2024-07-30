@@ -1,8 +1,15 @@
-import React, { ReactEventHandler, useCallback, useRef, useState } from 'react';
+import React, {
+  Fragment,
+  useState,
+} from 'react';
 import Button from '../../components/Button';
 import Container from './Container';
-import { Formik, FormikErrors, Field, ErrorMessage } from 'formik';
+import { Formik, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import api from '$/utils/fetch';
+import { RegisterDto, UserSourceType, UserType } from '@org/types/src';
+import { usePayload } from './PayloadContext';
+import { CODE_SUCCESS, HEADER_PRE_TOKEN } from '@org/common/src';
 
 const SignupSchema = Yup.object().shape({
   firstName: Yup.string().max(50, 'Too Long').required('Required'),
@@ -10,12 +17,12 @@ const SignupSchema = Yup.object().shape({
   lastName: Yup.string().max(50, 'Too Long!').required('Required'),
   addressState: Yup.string().required('Required'),
   addressCity: Yup.string().required('Required'),
-  //password
-  //rePassword
-  birthday: Yup.date()
-    .max(new Date(Date.now() - 567648000000), 'You must be at least 18 years')
+  password: Yup.string().required('Required'),
+  rePassword: Yup.string().required('Required'),
+  birthday: Yup.string()
+    .matches(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
     .nullable(),
-  source: Yup.string().nullable(),
+  source: Yup.number().nullable(),
   email: Yup.string().email('Invalid email').nullable(),
   whatsapp: Yup.string().nullable(),
   facebook: Yup.string().nullable(),
@@ -30,7 +37,7 @@ interface FormData {
   addressState: string;
   addressCity: string;
   birthday: string;
-  source: string;
+  source: number;
   email: string;
   whatsapp: string;
   facebook: string;
@@ -47,7 +54,7 @@ const defaultValue: FormData = {
   addressCity: '',
   addressDetail: '',
   birthday: '',
-  source: '',
+  source: 0,
   whatsapp: '',
   facebook: '',
 };
@@ -55,36 +62,53 @@ const defaultValue: FormData = {
 const DEFAULT_INPUT_STYLES =
   'block items-center justify-center rounded-xl py-5 px-6 w-full bg-white border-white border-2 font-bold text-xs';
 
-const Step3 = () => {
-  const initValue: FormData = defaultValue;
-  const [showPassword, togglePassword] = useState(false)
-  const [showRePassword, toggleRePassword] = useState(false)
+type Props = {
+  onSuccess: () => void;
+};
 
-  const handleSubmit = () => {};
+const Step3 = (props: Props) => {
+  const initValue: FormData = defaultValue;
+  const [showPassword, togglePassword] = useState(false);
+  const [showRePassword, toggleRePassword] = useState(false);
+  const { phone, token } = usePayload();
 
   return (
-    <Container
-      title="Create an Account"
-      step={3}
-      bottomEle={
-        <div className="text-center">
-          <Button onClick={handleSubmit} className="mb-8">
-            Submit
-          </Button>
-          <Button onClick={handleSubmit} theme="transparent">
-            Cancel
-          </Button>
-        </div>
-      }
-    >
+    <Container title="Account detail" step={3}>
       <Formik
         initialValues={initValue}
         validationSchema={SignupSchema}
         onSubmit={(values, { setSubmitting }) => {
-          setTimeout(() => {
-            alert(JSON.stringify(values, null, 2));
-            setSubmitting(false);
-          }, 400);
+          const payload: RegisterDto = {
+            phone: phone || 'None',
+            type: UserType.CLIENT,
+            password: values.password,
+            re_password: values.rePassword,
+            first_name: values.firstName,
+            mid_name: values.midName,
+            last_name: values.lastName,
+            address_state: values.addressState,
+            address_city: values.addressCity,
+            address_detail: values.addressDetail,
+            birthday: values.birthday,
+            source: UserSourceType.NONE,
+            email: values.email,
+            whatsapp: values.whatsapp,
+            facebook: values.facebook,
+          };
+          setSubmitting(true);
+          api
+            .post('/auth/register', payload, {
+              headers: {
+                [HEADER_PRE_TOKEN]: token
+              }
+            })
+            .then((res) => {
+              if (res.bizCode == CODE_SUCCESS) props.onSuccess();
+              else {
+                //! alert
+              }
+            })
+            .finally(() => setSubmitting(false));
         }}
       >
         {({
@@ -96,182 +120,201 @@ const Step3 = () => {
           handleSubmit,
           isSubmitting,
         }) => (
-          <div className="flex-1 overflow-auto py-8">
-            <form onSubmit={handleSubmit} className="h-full overflow-auto px-8">
-              <div className="space-y-4">
-                <label>
-                  <Field
-                    placeholder="Account Number"
-                    type="number"
-                    className={DEFAULT_INPUT_STYLES}
-                  />
-                </label>
-                <label htmlFor="password">
-                <div className="flex items-center justify-between py-4 px-6 bg-white border-white p-4 rounded-xl border-2 w-full text-xs">
-                  <Field
-                    id="password"
+          <Fragment>
+            <h4 className="text-primary text-xl mt-20">Enter Account Detail</h4>
+            <div className="flex-1 overflow-auto mt-6">
+              <form onSubmit={handleSubmit} className="h-full overflow-auto">
+                <div className="space-y-4">
+                  <div className={DEFAULT_INPUT_STYLES}>
+                    <p className='text-gray-300'>{phone}</p>
+                  </div>
+                  <label htmlFor="password">
+                    <div className="relative">
+                      <Field
+                        id="password"
+                        name="password"
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="Password"
+                        className={`${DEFAULT_INPUT_STYLES} pr-12`}
+                      />
+                      <img
+                        src="assets/eye.svg"
+                        alt="hidden"
+                        onClick={() => togglePassword((pre) => !pre)}
+                        className="absolute"
+                        style={{ right: 18, top: 20 }}
+                      />
+                    </div>
+                  </label>
+                  <ErrorMessage
                     name="password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Password"
+                    className="text-red-500"
+                    component="span"
                   />
-                    <img src="assets/eye.svg" alt="hidden" onClick={() => togglePassword(pre => !pre)} />
-                  </div>
-                </label>
-                <ErrorMessage
-                  name="password"
-                  className="text-red-500"
-                  component="span"
-                />
-                <label htmlFor="rePassword">
-                <div className="flex items-center justify-between py-4 px-6 bg-white border-white p-4 rounded-xl border-2 w-full text-xs">
-                  <Field
-                    id="rePassword"
+                  <label htmlFor="rePassword">
+                    <div className="relative">
+                      <Field
+                        id="rePassword"
+                        name="rePassword"
+                        type={showRePassword ? 'text' : 'password'}
+                        placeholder="Re-enter Password"
+                        className={`${DEFAULT_INPUT_STYLES} pr-12`}
+                      />
+                      <img
+                        src="assets/eye.svg"
+                        alt="hidden"
+                        onClick={() => toggleRePassword((pre) => !pre)}
+                        className="absolute"
+                        style={{ right: 18, top: 20 }}
+                      />
+                    </div>
+                  </label>
+                  <ErrorMessage
                     name="rePassword"
-                    type={showRePassword ? 'text' : 'password'}
-                    placeholder="Re-enter Password"
+                    className="text-red-500"
+                    component="span"
                   />
-                    <img src="assets/eye.svg" alt="hidden" onClick={() => toggleRePassword(pre => !pre)} />
-                  </div>
-                </label>
-                <ErrorMessage
-                  name="rePassword"
-                  className="text-red-500"
-                  component="span"
-                />
-                <label htmlFor="firstName">
-                  <Field
-                    id="firstName"
+                  <label htmlFor="firstName">
+                    <Field
+                      id="firstName"
+                      name="firstName"
+                      placeholder="First Name"
+                      className={DEFAULT_INPUT_STYLES}
+                    />
+                  </label>
+                  <ErrorMessage
                     name="firstName"
-                    placeholder="First Name"
-                    className={DEFAULT_INPUT_STYLES}
+                    className="text-red-500"
+                    component="span"
                   />
-                </label>
-                <ErrorMessage
-                  name="firstName"
-                  className="text-red-500"
-                  component="span"
-                />
-                <label htmlFor="midName">
-                  <Field
-                    id="midName"
+                  <label htmlFor="midName">
+                    <Field
+                      id="midName"
+                      name="midName"
+                      placeholder="Mid Name"
+                      className={DEFAULT_INPUT_STYLES}
+                    />
+                  </label>
+                  <ErrorMessage
                     name="midName"
-                    placeholder="Mid Name"
-                    className={DEFAULT_INPUT_STYLES}
+                    className="text-red-500"
+                    component="span"
                   />
-                </label>
-                <ErrorMessage
-                  name="midName"
-                  className="text-red-500"
-                  component="span"
-                />
-                <label htmlFor="lastName">
-                  <Field
-                    id="lastName"
+                  <label htmlFor="lastName">
+                    <Field
+                      id="lastName"
+                      name="lastName"
+                      placeholder="Last Name"
+                      className={DEFAULT_INPUT_STYLES}
+                    />
+                  </label>
+                  <ErrorMessage
                     name="lastName"
-                    placeholder="Last Name"
-                    className={DEFAULT_INPUT_STYLES}
+                    className="text-red-500"
+                    component="span"
                   />
-                </label>
-                <ErrorMessage
-                  name="lastName"
-                  className="text-red-500"
-                  component="span"
-                />
-                <label htmlFor="addressState">
-                  <Field
-                    id="addressState"
+                  <label htmlFor="addressState">
+                    <Field
+                      id="addressState"
+                      name="addressState"
+                      placeholder="State"
+                      className={DEFAULT_INPUT_STYLES}
+                    />
+                  </label>
+                  <ErrorMessage
                     name="addressState"
-                    placeholder="State"
-                    className={DEFAULT_INPUT_STYLES}
+                    className="text-red-500"
+                    component="span"
                   />
-                </label>
-                <ErrorMessage
-                  name="addressState"
-                  className="text-red-500"
-                  component="span"
-                />
-                <label htmlFor="addressCity">
-                  <Field
-                    id="addressCity"
+                  <label htmlFor="addressCity">
+                    <Field
+                      id="addressCity"
+                      name="addressCity"
+                      placeholder="City"
+                      className={DEFAULT_INPUT_STYLES}
+                    />
+                  </label>
+                  <ErrorMessage
                     name="addressCity"
-                    placeholder="City"
-                    className={DEFAULT_INPUT_STYLES}
+                    className="text-red-500"
+                    component="span"
                   />
-                </label>
-                <ErrorMessage
-                  name="addressCity"
-                  className="text-red-500"
-                  component="span"
-                />
-                <label htmlFor="birthday">
-                  <Field
-                    id="birthday"
+                  <label htmlFor="birthday">
+                    <Field
+                      id="birthday"
+                      name="birthday"
+                      placeholder="Birthday"
+                      className={DEFAULT_INPUT_STYLES}
+                    />
+                  </label>
+                  <ErrorMessage
                     name="birthday"
-                    placeholder="Birthday"
-                    className={DEFAULT_INPUT_STYLES}
+                    className="text-red-500"
+                    component="span"
                   />
-                </label>
-                <ErrorMessage
-                  name="birthday"
-                  className="text-red-500"
-                  component="span"
-                />
-                <label htmlFor="source">
-                  <Field
-                    id="source"
+                  <label htmlFor="source">
+                    <Field
+                      id="source"
+                      name="source"
+                      placeholder="Source"
+                      className={DEFAULT_INPUT_STYLES}
+                    />
+                  </label>
+                  <ErrorMessage
                     name="source"
-                    placeholder="Source"
-                    className={DEFAULT_INPUT_STYLES}
+                    className="text-red-500"
+                    component="span"
                   />
-                </label>
-                <ErrorMessage
-                  name="source"
-                  className="text-red-500"
-                  component="span"
-                />
-                <label htmlFor="email">
-                  <Field
-                    id="email"
+                  <label htmlFor="email">
+                    <Field
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="Email"
+                      className={DEFAULT_INPUT_STYLES}
+                    />
+                  </label>
+                  <ErrorMessage
                     name="email"
-                    type="email"
-                    placeholder="Email"
-                    className={DEFAULT_INPUT_STYLES}
+                    className="text-red-500"
+                    component="span"
                   />
-                </label>
-                <ErrorMessage
-                  name="email"
-                  className="text-red-500"
-                  component="span"
-                />
-                <label htmlFor="whatsapp">
-                  <Field
-                    id="whatsapp"
+                  <label htmlFor="whatsapp">
+                    <Field
+                      id="whatsapp"
+                      name="whatsapp"
+                      placeholder="Whatsapp ID"
+                      className={DEFAULT_INPUT_STYLES}
+                    />
+                  </label>
+                  <ErrorMessage
                     name="whatsapp"
-                    placeholder="Whatsapp ID"
-                    className={DEFAULT_INPUT_STYLES}
+                    className="text-red-500"
+                    component="span"
                   />
-                </label>
-                <ErrorMessage
-                  name="whatsapp"
-                  className="text-red-500"
-                  component="span"
-                />
-                <label htmlFor="facebook">
-                  <Field
-                    id="facebook"
+                  <label htmlFor="facebook">
+                    <Field
+                      id="facebook"
+                      name="facebook"
+                      placeholder="Facebook ID"
+                      className={DEFAULT_INPUT_STYLES}
+                    />
+                  </label>
+                  <ErrorMessage
                     name="facebook"
-                    placeholder="Facebook ID"
-                    className={DEFAULT_INPUT_STYLES}
+                    className="text-red-500"
+                    component="span"
                   />
-                </label>
-                <ErrorMessage
-                  name="facebook"
-                  className="text-red-500"
-                  component="span"
-                />
-              </div>
-            </form>
-          </div>
+                </div>
+              </form>
+            </div>
+            <div className="text-center mt-6">
+              <Button onClick={() => handleSubmit()}>Submit</Button>
+              {/* <Button onClick={() => handleSubmit()} theme="transparent">
+            Cancel
+          </Button> */}
+            </div>
+          </Fragment>
         )}
       </Formik>
     </Container>

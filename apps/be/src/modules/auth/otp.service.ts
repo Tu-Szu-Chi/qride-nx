@@ -22,27 +22,28 @@ export class OtpService {
     private readonly userService: UserService
   ) {}
   async generateOtp(phone: string, type: OtpTypeEnum): Promise<string> {
+    // !check rate-limit
     if (isEmpty(phone)) throw new InternalServerErrorException('Invalid phone');
     if (OtpTypeEnum.RESET_PASSWORD == type) {
         const user = await this.userService.findOne(phone);
         if (isEmpty(user)) throw new InternalServerErrorException('Invalid phone');
     }
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    await this.otpRepository.create({ phone, type, otp })
+    const code = Math.floor(1000 + Math.random() * 9000).toString();
+    await this.otpRepository.create({ phone, type, code })
     // 在這裡實現發送 OTP 到用戶手機的邏輯
-    return otp;
+    return code;
   }
 
   async verifyOtp(
     phone: string,
-    otp: string,
+    code: string,
     type: OtpTypeEnum
   ): Promise<string> {
-    const otpEntity = await this.otpRepository.findOne(phone, otp, type);
+    const otpEntity = await this.otpRepository.findOne(phone, code, type);
     if (isEmpty(otpEntity)) {
       throw new BadRequestException("Invalid code")
     }
-    this.otpRepository.verify(phone)
+    await this.otpRepository.verify(otpEntity.id)
 
     return this.jwtService.sign(
       { phone, verified: true, type },

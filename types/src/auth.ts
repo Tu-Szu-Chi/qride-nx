@@ -30,7 +30,7 @@ export interface SendOtpDto {
 
 export interface VerifyOtpDto {
   phone: string;
-  otp: string;
+  code: string;
   type: OtpTypeEnum;
 }
 export interface ResetPasswordDto {
