@@ -7,6 +7,8 @@ import { OtpTypeEnum, SendOtpDto } from '@org/types/src';
 import { CODE_SUCCESS } from '@org/common/src';
 import { usePayload } from './PayloadContext';
 import { Fragment } from 'react';
+import SubmitButton from '$/components/Button/SubmitButton';
+import { NOOP } from '$/utils';
 interface FormData {
   phone: string;
 }
@@ -58,6 +60,7 @@ const Step1 = (props: Props) => {
           handleBlur,
           handleSubmit,
           isSubmitting,
+          isValid
         }) => (
           <Fragment>
             <div className="mt-auto">
@@ -86,13 +89,10 @@ const Step1 = (props: Props) => {
             </div>
             <div className="flex justify-between items-center mt-auto">
               <span className="text-xl text-white">Send</span>
-              <div className="rounded-full bg-white p-2" onClick={() => handleSubmit()}>
-                <img
-                  src="assets/arrow_right.svg"
-                  alt="submit"
-                  className="w-8 h-8"
-                />
-              </div>
+              <SubmitButton
+                isLoading={isSubmitting}
+                onClick={() => isValid ? handleSubmit() : NOOP()}
+              />
             </div>
           </Fragment>
         )}

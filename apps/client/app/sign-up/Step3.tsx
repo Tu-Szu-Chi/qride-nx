@@ -309,10 +309,7 @@ const Step3 = (props: Props) => {
               </form>
             </div>
             <div className="text-center mt-6">
-              <Button onClick={() => handleSubmit()}>Submit</Button>
-              {/* <Button onClick={() => handleSubmit()} theme="transparent">
-            Cancel
-          </Button> */}
+              <Button isLoading={isSubmitting} onClick={() => handleSubmit()}>Submit</Button>
             </div>
           </Fragment>
         )}

@@ -5,7 +5,9 @@ import Link from 'next/link';
 import Title from '../../components/Title';
 import GradientBackground from '../../../client/components/GradientBackground';
 import API from '$/utils/fetch';
-import { FormEvent, Fragment, useEffect, useRef } from 'react';
+import {  Fragment } from 'react';
+import SubmitButton from '$/components/Button/SubmitButton';
+import { NOOP } from '$/utils';
 
 interface FormData {
   phone: string;
@@ -33,6 +35,7 @@ export default function SignUp() {
             return errors;
           }}
           onSubmit={(values, { setSubmitting }) => {
+            setSubmitting(true)
             API.post('auth/login', {
               phone: String(values.phone),
               password: values.password,
@@ -40,7 +43,7 @@ export default function SignUp() {
               console.log(res);
             }).catch(err => {
               console.log(err)
-            })
+            }).finally(() => setSubmitting(false))
           }}
         >
           {({
@@ -51,6 +54,7 @@ export default function SignUp() {
             handleBlur,
             handleSubmit,
             isSubmitting,
+            isValid
           }) => (
             <Fragment>
               <div className="space-y-8 p-2">
@@ -98,16 +102,10 @@ export default function SignUp() {
               </div>
               <div className="flex justify-between items-center mt-auto">
                 <span className="text-xl text-white">Sign In</span>
-                <div
-                  className="rounded-full bg-white p-2"
-                  onClick={() => handleSubmit()}
-                >
-                  <img
-                    src="assets/arrow_right.svg"
-                    alt="submit"
-                    className="w-8 h-8"
-                  />
-                </div>
+                <SubmitButton
+                  onClick={() => isValid ? handleSubmit() : NOOP()}
+                  isLoading={isSubmitting}
+                />
               </div>
             </Fragment>
           )}

@@ -2,12 +2,14 @@ import React, { ButtonHTMLAttributes } from 'react';
 
 type ButtonProps = ButtonHTMLAttributes<HTMLDivElement> & {
   theme?: 'primary' | 'light' | 'transparent' | 'dark';
+  isLoading?: boolean;
 };
 
 const Button: React.FC<ButtonProps> = ({
   theme = 'primary',
   className,
   children,
+  isLoading,
   ...props
 }) => {
   const baseClasses =
@@ -34,7 +36,12 @@ const Button: React.FC<ButtonProps> = ({
 
   return (
     <div className={`${themeClasses} ${baseClasses}  ${className}`} {...props}>
-      {children}
+      {isLoading ? (
+        <div className={`w-8 h-8 border-4 border-white 
+          ${theme == 'dark' ? 'border-t-primary-500' : 'border-t-primary'} rounded-full animate-spin`}></div>
+      ) : (
+        children
+      )}
     </div>
   );
 };

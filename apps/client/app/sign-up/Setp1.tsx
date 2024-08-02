@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useRef } from 'react';
+import { Fragment } from 'react';
 import Container from './Container';
 import { Formik, FormikErrors, Field, ErrorMessage } from 'formik';
 import Link from 'next/link';
@@ -6,6 +6,7 @@ import api from '$/utils/fetch';
 import { OtpTypeEnum } from '@org/types/src';
 import { CODE_SUCCESS } from '@org/common/src';
 import { usePayload } from './PayloadContext';
+import SubmitButton from '$/components/Button/SubmitButton';
 
 interface FormData {
   phone: string;
@@ -15,12 +16,9 @@ type Props = {
 };
 
 const Step1 = (props: Props) => {
-  const btnRef = useRef<HTMLButtonElement>(null);
   const { setPhone } = usePayload()
   const initValue: FormData = { phone: '' };
-  const handleSubmitClick = useCallback(() => {
-    btnRef.current?.click();
-  }, [btnRef]);
+
   return (
     <Container title="Create an account" step={1}>
       <Formik
@@ -93,19 +91,12 @@ const Step1 = (props: Props) => {
             <div className='mt-auto'>
               <div className="flex justify-between items-center mb-11">
                 <span className="text-xl text-white">Sign Up</span>
-                <div
-                  onClick={handleSubmitClick}
-                  className="rounded-full bg-white p-2"
-                >
-                  <img
-                    src="assets/arrow_right.svg"
-                    alt="submit"
-                    className="w-8 h-8"
-                    onClick={() => {
-                      if (isValid) handleSubmit()
-                    }}
-                  />
-                </div>
+                <SubmitButton
+                  isLoading={isSubmitting}
+                  onClick={() => {
+                    if (isValid) handleSubmit()
+                  }}
+                />
               </div>
               <p className="text-white text-center">
                 Already a member?&nbsp;

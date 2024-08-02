@@ -10,6 +10,7 @@ import { ResetPasswordDto } from '@org/types/src';
 import { CODE_SUCCESS, HEADER_PRE_TOKEN } from '@org/common/src';
 import { useRouter } from 'next/navigation';
 import { usePayload } from './PayloadContext';
+import { NOOP } from '$/utils';
 
 const FormSchema = Yup.object().shape({
   password: Yup.string().max(50, 'Too Long').required('Required'),
@@ -67,6 +68,7 @@ const Step3 = () => {
           handleBlur,
           handleSubmit,
           isSubmitting,
+          isValid
         }) => (
           <Fragment>
             <div className="mt-auto">
@@ -117,7 +119,8 @@ const Step3 = () => {
               <Button
                 theme="dark"
                 style={{ width: '85px' }}
-                onClick={() => handleSubmit()}
+                isLoading={isSubmitting}
+                onClick={() => isValid ? handleSubmit() : NOOP()}
               >
                 Save
               </Button>
