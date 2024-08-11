@@ -10,7 +10,7 @@ export interface UserEntity {
   address_state: string;
   address_city: string;
   address_detail?: string; 
-  birthday?: Date; 
+  birthday?: string; 
   source?: number; 
   whatsapp?: string; 
   facebook?: string; 

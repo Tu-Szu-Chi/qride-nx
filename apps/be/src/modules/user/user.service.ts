@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { RegisterDto, User, UserEntity, UserUpdateDto, UserVO } from '@org/types';
 import { UserRepository } from './user.repository';
 import { omit } from 'lodash';
-import { fromDate } from '@org/common';
 
 @Injectable()
 export class UserService {
@@ -18,7 +17,6 @@ export class UserService {
     const user = await this.userRepository.findById(userId)
     return {
       ...omit(user, ['is_delete', 'created_at', 'updated_at', 'password', 'birthday']),
-      birthday: user.birthday ? fromDate(user.birthday) : null
     }
   }
 
@@ -39,7 +37,6 @@ export class UserService {
         'password',
         'birthday'
       ]),
-      birthday: userEntity.birthday ? fromDate(userEntity.birthday) : null
     };
   }
 
@@ -66,7 +63,6 @@ export class UserService {
         'password',
         'birthday'
       ]),
-      birthday: userEntity.birthday ? fromDate(userEntity.birthday) : null
     };
   }
 }
