@@ -1,7 +1,11 @@
 import Link from 'next/link';
 import Button from '../components/Button';
+import { useEffect } from 'react';
 
 export default async function Index() {
+  useEffect(() => {
+// check login status, if login-in, direct to /home
+  }, [])
   return (
     <div className="w-full flex flex-col justify-between items-center min-h-full flex-1  bg-primary">
       <Banner />
