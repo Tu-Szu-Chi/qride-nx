@@ -5,7 +5,7 @@ import Container from './Container';
 import Button from '../../components/Button';
 import * as Yup from 'yup';
 import { Fragment, useState } from 'react';
-import api from '$/utils/fetch';
+import API from '$/utils/fetch';
 import { ResetPasswordDto } from '@org/types/src';
 import { CODE_SUCCESS, HEADER_PRE_TOKEN } from '@org/common/src';
 import { useRouter } from 'next/navigation';
@@ -42,7 +42,7 @@ const Step3 = () => {
             re_password: values.rePassword,
           };
           setSubmitting(true);
-          api
+          API
             .post('/auth/reset-password', payload, {
               headers: {
                 [HEADER_PRE_TOKEN]: token,

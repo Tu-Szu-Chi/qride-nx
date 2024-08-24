@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Container from './Container';
-import api from '$/utils/fetch';
+import API from '$/utils/fetch';
 import { OtpTypeEnum, VerifyOtpDto } from '@org/types/src';
 import { usePayload } from './PayloadContext';
 import { CODE_SUCCESS } from '@org/common/src';
@@ -36,7 +36,7 @@ const Step2 = (props: Props) => {
       type: OtpTypeEnum.RESET_PASSWORD,
     };
     setLoading(true);
-    api
+    API
       .post('/auth/otp/verify', payload)
       .then((res) => {
         if (res.bizCode == CODE_SUCCESS) {

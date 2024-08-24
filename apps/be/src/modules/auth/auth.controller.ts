@@ -7,6 +7,7 @@ import {
   Headers,
   BadRequestException,
   InternalServerErrorException,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ACCESS_TOKEN,
@@ -28,6 +29,7 @@ import {
 } from '@org/types';
 import { OtpService } from './otp.service';
 import { OtpTypeEnum } from '@org/types';
+import { AuthGuard } from '@nestjs/passport';
 
 const oneDay = 24 * 60 * 60 * 1000;
 let isProd = false;
@@ -158,5 +160,11 @@ export class AuthController {
           message: 'Invalid code'
         }
       });
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('verify')
+  async verifyToken() {
+    return true;
   }
 }

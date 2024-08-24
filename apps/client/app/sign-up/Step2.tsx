@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Container from './Container';
-import api from '$/utils/fetch';
+import API from '$/utils/fetch';
 import { OtpTypeEnum } from '@org/types/src';
 import { usePayload } from './PayloadContext';
 import { CODE_SUCCESS } from '@org/common/src';
@@ -31,7 +31,7 @@ const Step2 = (props: Props) => {
   };
   const handleSubmit = () => {
     setLoading(true);
-    api
+    API
       .post('/auth/otp/verify', {
         phone,
         code: otp.join(''),

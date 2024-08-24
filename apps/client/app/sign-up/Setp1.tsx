@@ -2,7 +2,7 @@ import { Fragment } from 'react';
 import Container from './Container';
 import { Formik, FormikErrors, Field, ErrorMessage } from 'formik';
 import Link from 'next/link';
-import api from '$/utils/fetch';
+import API from '$/utils/fetch';
 import { OtpTypeEnum } from '@org/types/src';
 import { CODE_SUCCESS } from '@org/common/src';
 import { usePayload } from './PayloadContext';
@@ -35,7 +35,7 @@ const Step1 = (props: Props) => {
         onSubmit={(values, { setSubmitting, setFieldError }) => {
           setSubmitting(true)
           const phone = String(values.phone)
-          api.post('/auth/otp/send', {
+          API.post('/auth/otp/send', {
             phone,
             type: OtpTypeEnum.REGISTER
           })

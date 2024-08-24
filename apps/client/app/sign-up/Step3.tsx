@@ -2,7 +2,7 @@ import React, { Fragment, useState } from 'react';
 import Container from './Container';
 import { Formik, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import api from '$/utils/fetch';
+import API from '$/utils/fetch';
 import { RegisterDto, UserSourceType, UserType } from '@org/types/src';
 import { usePayload } from './PayloadContext';
 import { CODE_SUCCESS, fromDate, HEADER_PRE_TOKEN } from '@org/common/src';
@@ -98,7 +98,7 @@ const Step3 = (props: Props) => {
             facebook: values.facebook,
           };
           setSubmitting(true);
-          api
+          API
             .post('/auth/register', payload, {
               headers: {
                 [HEADER_PRE_TOKEN]: token,

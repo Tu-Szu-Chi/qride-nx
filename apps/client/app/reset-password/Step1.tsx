@@ -2,7 +2,7 @@
 
 import { Formik, FormikErrors, Field, ErrorMessage } from 'formik';
 import Container from './Container';
-import api from '$/utils/fetch';
+import API from '$/utils/fetch';
 import { OtpTypeEnum, SendOtpDto } from '@org/types/src';
 import { CODE_SUCCESS } from '@org/common/src';
 import { usePayload } from './PayloadContext';
@@ -38,7 +38,7 @@ const Step1 = (props: Props) => {
             phone,
             type: OtpTypeEnum.RESET_PASSWORD,
           };
-          api
+          API
             .post('/auth/otp/send', payload)
             .then((res) => {
               if (res.bizCode == CODE_SUCCESS) {

@@ -8,6 +8,7 @@ import API from '$/utils/fetch';
 import {  Fragment } from 'react';
 import SubmitButton from '$/components/Button/SubmitButton';
 import { NOOP } from '$/utils';
+import { useRouter } from 'next/navigation';
 
 interface FormData {
   phone: string;
@@ -16,6 +17,7 @@ interface FormData {
 
 export default function SignUp() {
   const initValue: FormData = { phone: '', password: '' };
+  const router = useRouter();
 
   return (
     <GradientBackground>
@@ -40,7 +42,7 @@ export default function SignUp() {
               phone: String(values.phone),
               password: values.password,
             }).then((res) => {
-              console.log(res);
+              router.push("/member")
             }).catch(err => {
               console.log(err)
             }).finally(() => setSubmitting(false))
