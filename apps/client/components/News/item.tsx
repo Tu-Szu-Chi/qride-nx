@@ -1,17 +1,18 @@
-import React, { HTMLAttributes } from "react";
-import { ArticleType } from "@org/types/src";
+import React from "react";
+import { ArticleTypeEnum } from "@org/types/src";
 import { fromDate } from '@org/common/src';
+import { useRouter } from "next/navigation";
 
 
-const getTypeColor = (type: ArticleType) => {
+const getTypeColor = (type: ArticleTypeEnum) => {
     switch (type) {
-      case ArticleType.NEWS:
+      case ArticleTypeEnum.NEWS:
         return 'bg-blue-100';
-      case ArticleType.PROMO:
+      case ArticleTypeEnum.PROMO:
         return 'bg-orange-500';
-      case ArticleType.EVENT:
+      case ArticleTypeEnum.EVENT:
         return 'bg-red-200';
-      case ArticleType.MEDIA:
+      case ArticleTypeEnum.MEDIA:
         return 'bg-green-200';
       default:
         return 'bg-gray-500';
@@ -19,13 +20,16 @@ const getTypeColor = (type: ArticleType) => {
   };
 
 type Props = {
-   type: ArticleType,
+   type: ArticleTypeEnum,
    date: Date,
    title: string
 }
 
 const NewsItem: React.FC<Props> = ({ type, date, title }) => {
-    return <div className="flex items-start space-x-4">
+  const router = useRouter()
+    return <div className="flex items-start space-x-4" onClick={() => {
+      router.push("/news/detail")
+    }}>
     <div className="rounded-xl w-24 h-24 bg-gray-300 flex-shrink-0"></div>
     <div className='py-3'>
       <div className="flex items-center space-x-2 mb-1">

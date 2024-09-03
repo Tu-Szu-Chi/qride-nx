@@ -58,7 +58,7 @@ export class AuthController {
     });
     res.cookie(HEADER_USER_ID, user_id, {
       secure: isProd,
-      sameSite: 'strict',
+      sameSite:  'strict',
       maxAge: oneDay,
     });
     return { access_token, user_id };

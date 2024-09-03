@@ -3,7 +3,7 @@
 import React from 'react';
 import Header from '$/components/Header';
 
-export default async function Privacy() {
+export default function Privacy() {
   return (
     <div className="w-full  min-h-full flex-1">
       <style jsx>
@@ -13,7 +13,7 @@ export default async function Privacy() {
           }
         `}
       </style>
-      <Header title="Terms of Service" />
+      <Header title="Privacy Policy" />
       <div className="p-6 content">
         <p>Qlink Rider Club Membership App Privacy Policy</p>
 

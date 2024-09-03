@@ -101,9 +101,7 @@ export class AuthService {
     const hashedPassword = await this.hashedPassword(payload.password);
     const userEntity = await this.userService.findOne(phone);
     if (isNull(userEntity)) throw new BadRequestException('Not found user');
-    await this.userService.updateUser(userEntity.id, {
-      password: hashedPassword,
-    });
+    await this.userService.updatePassword(userEntity.id, hashedPassword);
     return {
       bizCode: CODE_SUCCESS,
       data: true

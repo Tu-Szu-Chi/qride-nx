@@ -3,7 +3,7 @@
 import React from 'react';
 import Header from '$/components/Header';
 
-export default async function Terms() {
+export default function Terms() {
   return (
     <div className="w-full  min-h-full flex-1">
       <style jsx>

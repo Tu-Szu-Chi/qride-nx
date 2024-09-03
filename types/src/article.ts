@@ -1,4 +1,4 @@
-export enum ArticleType {
+export enum ArticleTypeEnum {
     NEWS = 'News',
     PROMO = 'Promo',
     EVENT = 'Event',

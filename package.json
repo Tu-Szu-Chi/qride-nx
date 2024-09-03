@@ -14,6 +14,7 @@
     "node": "18.17.x"
   },
   "dependencies": {
+    "@emotion/css": "^11.13.0",
     "@nestjs/common": "^10.3.3",
     "@nestjs/config": "^3.2.3",
     "@nestjs/core": "^10.3.3",

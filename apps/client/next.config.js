@@ -18,6 +18,14 @@ const nextConfig = {
     config.resolve.alias['@org'] = path.join(__dirname, '');
     return config;
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: `${process.env.NEXT_PUBLIC_API_URL}/:path*`,
+      },
+    ]
+  }
 };
 
 const plugins = [

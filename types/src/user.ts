@@ -29,11 +29,17 @@ export type UserDto = Omit<User, 'id' | 'created_at' | 'updated_at' | 'is_delete
 }
 export interface UserUpdateDto {
   email?: string;
-  password?: string;
   address_detail?: string
   birthday?: string;
+  password?: string;
   whatsapp?: string;
   facebook?: string;
+  type?: UserType;
+  first_name?: string;
+  mid_name?: string; 
+  last_name?: string;
+  address_state?: string;
+  address_city?: string;
   is_delete?: boolean;
 }
 

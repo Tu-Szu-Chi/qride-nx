@@ -2,6 +2,7 @@
 export * from './auth';
 export * from './user';
 export * from './article'
+export * from './product'
 
 export interface Error {
     bizCode: number;

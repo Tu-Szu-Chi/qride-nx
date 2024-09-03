@@ -22,7 +22,7 @@ async function validateToken(token: string): Promise<boolean> {
 }
 
 // 這個函數可以是異步的，如果您需要等待 API 響應
-const protectedPaths = ['/member'];
+const protectedPaths = ['/member', '/garage'];
 export async function middleware(request: NextRequest) {
   // 獲取 token，這裡假設它存儲在 cookie 中
   const token = request.cookies.get(ACCESS_TOKEN)?.value;

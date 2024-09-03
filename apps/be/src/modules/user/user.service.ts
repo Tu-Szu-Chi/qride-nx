@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { RegisterDto, User, UserEntity, UserUpdateDto, UserVO } from '@org/types';
 import { UserRepository } from './user.repository';
 import { omit } from 'lodash';
@@ -52,8 +52,23 @@ export class UserService {
 //     }
 //     return false;
 //   }
+async updatePassword(userId: string, password: string): Promise<UserVO> {
+  
+  const userEntity = await this.userRepository.update(userId, { password });
+  return {
+    ...omit(userEntity, [
+      'created_at',
+      'updated_at',
+      'is_delete',
+      'password',
+      'birthday'
+    ]),
+  };
+}
 
   async updateUser(userId: string, updateData: UserUpdateDto): Promise<UserVO> {
+    if (updateData.password != null) throw new BadRequestException();
+    
     const userEntity = await this.userRepository.update(userId, updateData);
     return {
       ...omit(userEntity, [

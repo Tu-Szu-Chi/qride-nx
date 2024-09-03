@@ -1,13 +1,16 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Header from '$/components/Header';
-import { UserVO } from '@org/types';
+import { UserUpdateDto, UserVO } from '@org/types';
 import API from '$/utils/fetch';
-import { typedObjectEntries } from '@org/common/src';
+
+type KEY = keyof UserVO;
+
+type EditableKey = Exclude<KEY, 'id' | 'phone' | 'type'>;
 
 type Columns = {
-  [K in keyof UserVO]: {
+  [k in KEY]: {
     title: string;
     editable?: boolean;
   };
@@ -18,7 +21,7 @@ const ATTRS: Columns = {
     title: 'Member ID',
   },
   phone: {
-    title: 'Phone number'
+    title: 'Phone number',
   },
   type: {
     title: 'Type',
@@ -73,6 +76,28 @@ const Member = () => {
   const [user, setUser] = useState<UserVO | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [editKey, setEditKey] = useState<EditableKey | null>(null);
+  const [editValue, setEditValue] = useState<string>('');
+  const inputRefs = useRef<{
+    [key in EditableKey]: React.RefObject<HTMLInputElement>;
+  }>({} as { [key in EditableKey]: React.RefObject<HTMLInputElement> });
+
+  const saveChange = useCallback(async () => {
+    if (!editKey || !user) return;
+
+    const payload: UserUpdateDto = {
+      [editKey]: editValue,
+    };
+
+    try {
+      const newUserVO = await API.put<UserVO>('/user/info', payload);
+      setUser(newUserVO);
+      setEditKey(null);
+    } catch (err) {
+      console.error('Error updating user info:', err);
+      // 可以在這裡添加錯誤處理邏輯
+    }
+  }, [editKey, editValue, user]);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -92,6 +117,20 @@ const Member = () => {
     fetchUserInfo();
   }, []);
 
+  useEffect(() => {
+    (Object.keys(ATTRS) as Array<keyof typeof ATTRS>).forEach((key) => {
+      if (ATTRS[key].editable) {
+        inputRefs.current[key as EditableKey] = React.createRef<HTMLInputElement>();
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (editKey) {
+      inputRefs.current[editKey]?.current?.focus();
+    }
+  }, [editKey]);
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -99,28 +138,45 @@ const Member = () => {
   if (error) {
     return <div>Error: {error}</div>;
   }
+
   return (
-    <div className="w-full  min-h-full flex-1">
+    <div className="w-full min-h-full flex-1">
       <Header title="Member" />
       <div className="p-6 bg-gray-300 relative">
         <div className="border-white rounded-full border-4 w-16 h-16 ml-6" />
-        <img src="/assets/mail.png" className="absolute right-6 top-6" />
+        <img src="/assets/mail.png" alt="mail icon" className="absolute right-6 top-6" />
       </div>
       <div>
-        {typedObjectEntries(ATTRS).map(([key, data]) => {
-          return (
-            <div
-              className="flex justify-between items-center py-3 pl-12 pr-6 border-b-2 border-gray-100"
-              key={key}
-            >
-              <div className="flex flex-col text-gray-400">
-                <span className="text-xs mb-1">{data?.title}</span>
+        {(Object.entries(ATTRS) as [KEY, Columns[KEY]][]).map(([key, data]) => (
+          <div
+            className="flex justify-between items-center py-3 pl-12 pr-6 border-b-2 border-gray-100"
+            key={key}
+          >
+            <div className="flex flex-col text-gray-400">
+              <span className="text-xs mb-1">{data.title}</span>
+              {editKey === key ? (
+                <input
+                  ref={inputRefs.current[key as EditableKey]}
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onBlur={saveChange}
+                />
+              ) : (
                 <span className="font-semibold">{user?.[key]}</span>
-              </div>
-              {data?.editable && <img src='/assets/pencil.png' />}
+              )}
             </div>
-          );
-        })}
+            {data.editable && (
+              <img
+                src="/assets/pencil.png"
+                alt="edit"
+                onClick={() => {
+                  setEditKey(key as EditableKey);
+                  setEditValue(user?.[key]?.toString() || '');
+                }}
+              />
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );

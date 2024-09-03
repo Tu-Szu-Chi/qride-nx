@@ -3,15 +3,15 @@ import React from 'react';
 
 const menuItems = [
   ['Home', '/home'],
-  ['Member', ''],
-  ['My Garage', ''],
+  ['Member', '/member'],
+  ['My Garage', '/garage'],
   ['Service Records', ''],
   ['Coupons', ''],
   ['News', ''],
   ['Promotion', ''],
   ['Contact Us', ''],
-  ['Privacy Policy', ''],
-  ['Terms of Service', ''],
+  ['Privacy Policy', '/privacy-policy'],
+  ['Terms of Service', '/terms-of-service'],
 ];
 
 type Props = {

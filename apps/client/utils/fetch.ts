@@ -102,6 +102,6 @@ class Api {
 
 // 創建並導出 API 實例
 const API = new Api(
-  process.env.NEXT_PUBLIC_API_URL || 'https://api.example.com'
+  '/api' || 'https://api.example.com'
 );
 export default API;

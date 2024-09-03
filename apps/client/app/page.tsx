@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Button from '../components/Button';
 import { useEffect } from 'react';
 
-export default async function Index() {
+export default function Index() {
   useEffect(() => {
 // check login status, if login-in, direct to /home
   }, [])
