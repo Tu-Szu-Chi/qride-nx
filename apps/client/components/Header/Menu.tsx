@@ -7,7 +7,7 @@ const menuItems = [
   ['My Garage', '/garage'],
   ['Service Records', ''],
   ['Coupons', ''],
-  ['News', ''],
+  ['News', '/news'],
   ['Promotion', ''],
   ['Contact Us', ''],
   ['Privacy Policy', '/privacy-policy'],
