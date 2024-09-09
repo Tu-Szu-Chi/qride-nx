@@ -1,6 +1,7 @@
 import { ACCESS_TOKEN } from '@org/common/src';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import API from './utils/fetch';
 
 async function validateToken(token: string): Promise<boolean> {
   try {
@@ -45,13 +46,13 @@ export async function middleware(request: NextRequest) {
     if (!result) {
       return NextResponse.redirect(new URL('/', request.url));
     }
-    // 這裡您可以添加額外的邏輯來驗證 token
-    // 例如，發送請求到您的 API 來驗證 token
-    // 如果 token 無效，也重定向到首頁
-    // const isValidToken = await checkTokenValidity(token)
-    // if (!isValidToken) {
-    //   return NextResponse.redirect(new URL('/home', request.url))
-    // }
+  } else if (request.nextUrl.pathname == '/' && token) {
+    const result = await validateToken(token);
+    if (result) {
+      return NextResponse.redirect(new URL('/home', request.url));
+    } else {
+      API.clearToken();
+    }
   }
 
   // 如果不是受保護的路徑或者 token 有效，繼續請求
