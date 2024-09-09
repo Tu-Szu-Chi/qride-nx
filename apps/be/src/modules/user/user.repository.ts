@@ -36,7 +36,7 @@ export class UserRepository {
   async create(userDto: UserDto): Promise<UserEntity> {
     const userToInsert = Object.fromEntries(
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      Object.entries(userDto).filter(([_, v]) => v !== undefined)
+      Object.entries(userDto).filter(([_, v]) => v !== undefined && v != '')
     );
     if (isEmpty(userToInsert)) throw new BadRequestException("Empty payload");
 

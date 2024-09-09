@@ -13,7 +13,7 @@ import DatePickerClassNames from 'react-day-picker/style.module.css';
 console.log(DatePickerClassNames);
 const SignupSchema = Yup.object().shape({
   firstName: Yup.string().max(50, 'Too Long').required('Required'),
-  midName: Yup.string().max(50, 'Too Long').required('Required'),
+  midName: Yup.string().max(50, 'Too Long'),
   lastName: Yup.string().max(50, 'Too Long!').required('Required'),
   addressState: Yup.string().required('Required'),
   addressCity: Yup.string().required('Required'),
