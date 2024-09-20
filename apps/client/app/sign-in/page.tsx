@@ -69,6 +69,8 @@ export default function SignUp() {
                       placeholder="Mobile Number"
                       type="number"
                       className="flex-grow ml-2"
+                      autoComplete="on"
+                      
                     />
                   </div>
                 </label>

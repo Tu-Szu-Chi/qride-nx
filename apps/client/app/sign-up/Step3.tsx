@@ -3,22 +3,24 @@ import Container from './Container';
 import { Formik, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import API from '$/utils/fetch';
-import { RegisterDto, UserSourceType, UserType } from '@org/types/src';
+import { RegisterDto, UserSourceType, UserType } from 'types/src';
 import { usePayload } from './PayloadContext';
-import { CODE_SUCCESS, fromDate, HEADER_PRE_TOKEN } from '@org/common/src';
+import { CODE_SUCCESS, fromDate, HEADER_PRE_TOKEN, passwordRegex, STATES, typedObjectEntries, UserSourceDisplay } from '@org/common/src';
 import SubmitButton from '$/components/Button/SubmitButton';
 import { DayPicker } from 'react-day-picker';
 import DatePickerClassNames from 'react-day-picker/style.module.css';
+import DropdownField from '$/components/Dropdown';
+import { usePopup } from '$/hooks/PopupProvider';
+import { DEFAULT_ERROR_MSG } from 'common/src';
 
-console.log(DatePickerClassNames);
 const SignupSchema = Yup.object().shape({
   firstName: Yup.string().max(50, 'Too Long').required('Required'),
   midName: Yup.string().max(50, 'Too Long'),
   lastName: Yup.string().max(50, 'Too Long!').required('Required'),
   addressState: Yup.string().required('Required'),
   addressCity: Yup.string().required('Required'),
-  password: Yup.string().required('Required'),
-  rePassword: Yup.string().required('Required'),
+  password: Yup.string().matches(passwordRegex, 'Must include uppercase and symbol').required('Required'),
+  rePassword: Yup.string().oneOf([Yup.ref('password')], 'Passwords do not match').required('Required'),
   birthday: Yup.string()
     .matches(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
     .nullable(),
@@ -73,7 +75,7 @@ const Step3 = (props: Props) => {
   const [showRePassword, toggleRePassword] = useState(false);
   const [showDatePicker, toggleDatePicker] = useState(false);
   const { phone, token } = usePayload();
-
+  const {showPopup} = usePopup()
   return (
     <Container title="Account detail" step={3}>
       <Formik
@@ -107,7 +109,7 @@ const Step3 = (props: Props) => {
             .then((res) => {
               if (res.bizCode == CODE_SUCCESS) props.onSuccess();
               else {
-                //! alert
+                showPopup({ title: DEFAULT_ERROR_MSG})
               }
             })
             .finally(() => setSubmitting(false));
@@ -215,19 +217,20 @@ const Step3 = (props: Props) => {
                       component="span"
                     />
                   </label>
-                  <label htmlFor="addressState">
-                    <Field
+                  <DropdownField
+                    label="addressState"
                       id="addressState"
                       name="addressState"
                       placeholder="State"
                       className={DEFAULT_INPUT_STYLES}
-                    />
+                      options={STATES.map(value => ({value}))}
+                  >
                     <ErrorMessage
                       name="addressState"
                       className={DEFAULT_ERROR_MSG_CLASS}
                       component="span"
                     />
-                  </label>
+                    </DropdownField>
                   <label htmlFor="addressCity">
                     <Field
                       id="addressCity"
@@ -273,19 +276,24 @@ const Step3 = (props: Props) => {
                       )}
                     </div>
                   </label>
-                  <label htmlFor="source">
-                    <Field
-                      id="source"
-                      name="source"
+                  <DropdownField
+                    label="Source"
+                      id="Source"
+                      name="Source"
                       placeholder="Source"
                       className={DEFAULT_INPUT_STYLES}
-                    />
+                      options={typedObjectEntries(UserSourceType)
+                        .filter(([k, v]) => {
+                          return isNaN(Number(k)) && v !== UserSourceType.NONE
+                        })
+                        .map(([k, v]) => ({value: Number(v), label: UserSourceDisplay[v]}))}
+                  >
                     <ErrorMessage
                       name="source"
                       className={DEFAULT_ERROR_MSG_CLASS}
                       component="span"
                     />
-                  </label>
+                    </DropdownField>
                   <label htmlFor="email">
                     <Field
                       id="email"

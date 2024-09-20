@@ -1,6 +1,8 @@
+'use client'
+
+import { PopupProvider } from '$/hooks/PopupProvider';
 import './global.css';
 import { StyledJsxRegistry } from './registry';
-
 
 export default function RootLayout({
   children,
@@ -10,21 +12,18 @@ export default function RootLayout({
   return (
     <html>
       <body>
-        <StyledJsxRegistry>
-          <div className='h-screen'>
-          <Wrapper>
-          {children}
-          </Wrapper>
-
-          </div>
-        </StyledJsxRegistry>
+        <PopupProvider>
+          <StyledJsxRegistry>
+            <div className="h-screen">
+              <Wrapper>{children}</Wrapper>
+            </div>
+          </StyledJsxRegistry>
+        </PopupProvider>
       </body>
     </html>
   );
 }
 
-const Wrapper = ({ children } : { children: React.ReactNode }) => {
-  return <div className='h-full flex justify-center bg-white'>
-    {children}
-  </div> 
-}
+const Wrapper = ({ children }: { children: React.ReactNode }) => {
+  return <div className="h-full flex justify-center bg-white">{children}</div>;
+};

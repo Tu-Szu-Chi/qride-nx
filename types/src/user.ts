@@ -48,4 +48,9 @@ export enum UserType {
 }
 export enum UserSourceType {
   NONE = 0,
+  FriendsOrFamilyReferrals = 1,
+  Online = 2,
+  RetailShop = 3,
+  SalesEvent = 4,
+  ServiceCenter = 5
 }

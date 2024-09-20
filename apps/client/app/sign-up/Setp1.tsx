@@ -3,8 +3,8 @@ import Container from './Container';
 import { Formik, FormikErrors, Field, ErrorMessage } from 'formik';
 import Link from 'next/link';
 import API from '$/utils/fetch';
-import { OtpTypeEnum } from '@org/types/src';
-import { CODE_SUCCESS } from '@org/common/src';
+import { OtpTypeEnum } from 'types/src';
+import { CODE_SUCCESS } from 'common/src';
 import { usePayload } from './PayloadContext';
 import SubmitButton from '$/components/Button/SubmitButton';
 

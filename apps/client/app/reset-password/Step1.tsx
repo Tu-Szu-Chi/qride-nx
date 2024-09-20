@@ -45,7 +45,6 @@ const Step1 = (props: Props) => {
                 setPhone(phone);
                 props.onSuccess();
               } else {
-                //! alert
                 setFieldError('phone', res.data?.error?.message);
               }
             })

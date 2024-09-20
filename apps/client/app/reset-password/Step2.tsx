@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import Container from './Container';
 import API from '$/utils/fetch';
-import { OtpTypeEnum, VerifyOtpDto } from '@org/types/src';
+import { OtpTypeEnum, VerifyOtpDto } from 'types/src';
 import { usePayload } from './PayloadContext';
-import { CODE_SUCCESS } from '@org/common/src';
+import { CODE_SUCCESS } from 'common/src';
 import SubmitButton from '$/components/Button/SubmitButton';
+import { usePopup } from '$/hooks/PopupProvider';
+import { DEFAULT_ERROR_MSG } from 'common/src';
 
 type Props = {
   onSuccess: () => void;
@@ -14,6 +16,7 @@ const Step2 = (props: Props) => {
   const [otp, setOtp] = useState<string[]>(new Array(4).fill(''));
   const [isLoading, setLoading] = useState<boolean>(false);
   const { phone, setToken } = usePayload();
+  const { showPopup } = usePopup();
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     index: number
@@ -36,14 +39,13 @@ const Step2 = (props: Props) => {
       type: OtpTypeEnum.RESET_PASSWORD,
     };
     setLoading(true);
-    API
-      .post('/auth/otp/verify', payload)
+    API.post('/auth/otp/verify', payload)
       .then((res) => {
         if (res.bizCode == CODE_SUCCESS) {
           setToken(res.data);
           props.onSuccess();
         } else {
-          // ! alert
+          showPopup({ title: DEFAULT_ERROR_MSG });
         }
       })
       .finally(() => setLoading(false));

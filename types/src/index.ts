@@ -3,6 +3,7 @@ export * from './auth';
 export * from './user';
 export * from './article'
 export * from './product'
+export * from './moto'
 
 export interface Error {
     bizCode: number;
