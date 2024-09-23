@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ProductVO } from '@org/types/src';
-import { fromDateWithSlash } from '@org/common/src';
+import { ProductVO } from '@org/types';
+import { fromDateWithSlash } from '@org/common';
 import { useRouter } from 'next/navigation';
 import { css } from '@emotion/css';
 

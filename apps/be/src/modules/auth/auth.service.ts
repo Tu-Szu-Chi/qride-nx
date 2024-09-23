@@ -82,6 +82,9 @@ export class AuthService {
     const userEntity = await this.userService.findOne(phone)
     return !isNull(userEntity)
   }
+  refreshToken(userId: string, phone: string) {
+    return this.signToken(phone, userId)
+  }
   async resetPassword(payload: ResetPasswordDto, token: string) {
     const { type, verified, phone }: OtpJwtPayload =
       this.jwtService.verify(token);

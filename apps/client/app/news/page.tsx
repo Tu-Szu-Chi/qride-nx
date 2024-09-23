@@ -2,7 +2,7 @@
 
 import React from "react";
 import Header from "$/components/Header";
-import { ArticleTypeEnum } from "@org/types/src";
+import { ArticleTypeEnum } from "@org/types";
 import NewsItem from "$/components/News/item";
 
 const newsItems = [

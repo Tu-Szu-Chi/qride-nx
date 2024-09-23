@@ -4,7 +4,7 @@ import axios, {
   AxiosRequestConfig,
   AxiosResponse,
 } from 'axios';
-import { ACCESS_TOKEN } from '@org/common/src';
+import { ACCESS_TOKEN } from '@org/common';
 import { ApiResponse, Error } from '@org/types';
 import Cookies from 'js-cookie';
 

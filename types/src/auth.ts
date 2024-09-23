@@ -21,6 +21,7 @@ export interface RegisterDto {
 export interface LoginDto {
   phone: string;
   password: string;
+  remember_me?: boolean;
 }
 export interface SendOtpDto {
   phone: string;

@@ -4,7 +4,7 @@ import React from 'react';
 import { useEffect } from 'react';
 import Header from '$/components/Header';
 import Carousel from '$/components/Carousel';
-import { ArticleTypeEnum } from '@org/types/src';
+import { ArticleTypeEnum } from '@org/types';
 import NewsItem from '$/components/News/item';
 
 const menuItems = [

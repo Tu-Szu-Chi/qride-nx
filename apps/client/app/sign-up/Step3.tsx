@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 import API from '$/utils/fetch';
 import { RegisterDto, UserSourceType, UserType } from 'types/src';
 import { usePayload } from './PayloadContext';
-import { CODE_SUCCESS, fromDate, HEADER_PRE_TOKEN, passwordRegex, STATES, typedObjectEntries, UserSourceDisplay } from '@org/common/src';
+import { CODE_SUCCESS, fromDate, HEADER_PRE_TOKEN, passwordRegex, STATES, typedObjectEntries, UserSourceDisplay } from '@org/common';
 import SubmitButton from '$/components/Button/SubmitButton';
 import { DayPicker } from 'react-day-picker';
 import DatePickerClassNames from 'react-day-picker/style.module.css';

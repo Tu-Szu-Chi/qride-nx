@@ -13,6 +13,8 @@
     "incremental": true,
     "paths": {
       "$/*": ["./apps/client/*"],
+      "@org/common": ["common/src/index.ts"],
+      "@org/types": ["types/src/index.ts"]
     },
     "plugins": [
       {

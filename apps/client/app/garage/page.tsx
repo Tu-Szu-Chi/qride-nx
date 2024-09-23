@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import Header from '$/components/Header';
-import { ProductVO } from '@org/types/src';
-import { fromDateWithSlash } from '@org/common/src';
+import { ProductVO } from '@org/types';
+import { fromDateWithSlash } from '@org/common';
 import ProductCard from './card';
 
 const products: ProductVO[] = [

@@ -5,19 +5,22 @@ import Link from 'next/link';
 import Title from '../../components/Title';
 import GradientBackground from '../../../client/components/GradientBackground';
 import API from '$/utils/fetch';
-import {  Fragment } from 'react';
+import { Fragment, useState } from 'react';
 import SubmitButton from '$/components/Button/SubmitButton';
 import { NOOP } from '$/utils';
 import { useRouter } from 'next/navigation';
+import { usePopup } from '$/hooks/PopupProvider';
 
 interface FormData {
   phone: string;
   password: string;
+  rememberMe: boolean;
 }
 
-export default function SignUp() {
-  const initValue: FormData = { phone: '', password: '' };
+export default function SignIn() {
+  const initValue: FormData = { phone: '', password: '', rememberMe: false };
   const router = useRouter();
+  const { showPopup } = usePopup();
 
   return (
     <GradientBackground>
@@ -37,15 +40,20 @@ export default function SignUp() {
             return errors;
           }}
           onSubmit={(values, { setSubmitting }) => {
-            setSubmitting(true)
+            setSubmitting(true);
             API.post('auth/login', {
               phone: String(values.phone),
               password: values.password,
-            }).then((res) => {
-              router.push("/member")
-            }).catch(err => {
-              console.log(err)
-            }).finally(() => setSubmitting(false))
+              remember_me: values.rememberMe,
+            })
+              .then((res) => {
+                router.push('/member');
+              })
+              .catch((err) => {
+                console.log(err);
+                showPopup({ title: 'Incorrect password'})
+              })
+              .finally(() => setSubmitting(false));
           }}
         >
           {({
@@ -56,7 +64,8 @@ export default function SignUp() {
             handleBlur,
             handleSubmit,
             isSubmitting,
-            isValid
+            setFieldValue,
+            isValid,
           }) => (
             <Fragment>
               <div className="space-y-8 p-2">
@@ -70,7 +79,6 @@ export default function SignUp() {
                       type="number"
                       className="flex-grow ml-2"
                       autoComplete="on"
-                      
                     />
                   </div>
                 </label>
@@ -97,17 +105,31 @@ export default function SignUp() {
                     className="text-red-500"
                     component="span"
                   />
-                  <Link href="/reset-password">
-                    <h4 className="mt-2 text-gray-500 text-right">
-                      Forgot password?
-                    </h4>
-                  </Link>
+                  <div className="flex justify-between items-center">
+                    <label htmlFor="rememberMe" className='flex items-center pl-1'>
+                      <Field
+                        id="rememberMe"
+                        name="rememberMe"
+                        type="checkbox"
+                        className=""
+                        onChange={() => {
+                          setFieldValue('rememberMe', !values.rememberMe);
+                        }}
+                      />
+                      <span className='text-xs ml-2 mt-0.5'>Keep me signed in</span>
+                    </label>
+                    <Link href="/reset-password">
+                      <h4 className="mt-2 text-gray-500 text-right">
+                        Forgot password?
+                      </h4>
+                    </Link>
+                  </div>
                 </div>
               </div>
               <div className="flex justify-between items-center mt-auto">
                 <span className="text-xl text-white">Sign In</span>
                 <SubmitButton
-                  onClick={() => isValid ? handleSubmit() : NOOP()}
+                  onClick={() => (isValid ? handleSubmit() : NOOP())}
                   isLoading={isSubmitting}
                 />
               </div>

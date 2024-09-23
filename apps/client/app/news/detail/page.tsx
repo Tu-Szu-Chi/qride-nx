@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Header from "$/components/Header";
-import { fromDate } from "@org/common/src";
+import { fromDate } from "@org/common";
 
 
 

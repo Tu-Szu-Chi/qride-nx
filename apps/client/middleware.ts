@@ -1,4 +1,4 @@
-import { ACCESS_TOKEN } from '@org/common/src';
+import { ACCESS_TOKEN } from '@org/common';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import API from './utils/fetch';

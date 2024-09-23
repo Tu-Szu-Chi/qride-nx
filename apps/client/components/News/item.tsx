@@ -1,6 +1,6 @@
 import React from "react";
-import { ArticleTypeEnum } from "@org/types/src";
-import { fromDate } from '@org/common/src';
+import { ArticleTypeEnum } from "@org/types";
+import { fromDate } from '@org/common';
 import { useRouter } from "next/navigation";
 
 

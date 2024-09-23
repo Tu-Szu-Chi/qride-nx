@@ -8,6 +8,7 @@ import {
   BadRequestException,
   InternalServerErrorException,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import {
   ACCESS_TOKEN,
@@ -30,14 +31,18 @@ import {
 import { OtpService } from './otp.service';
 import { OtpTypeEnum } from '@org/types';
 import { AuthGuard } from '@nestjs/passport';
+import { UserId } from '../../decorators/userId.decorator';
+import { JwtService } from '@nestjs/jwt';
+import { RequestWithUser } from '../../types';
 
-const oneDay = 24 * 60 * 60 * 1000;
+const oneMonth = 30 * 24 * 60 * 60 * 1000;
 let isProd = false;
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
-    private otpService: OtpService
+    private otpService: OtpService,
+    private jwtService: JwtService
   ) {
     isProd = process.env.NODE_ENV !== 'development';
   }
@@ -51,16 +56,7 @@ export class AuthController {
       body.phone,
       body.password
     );
-    res.cookie(ACCESS_TOKEN, access_token, {
-      secure: isProd,
-      sameSite: 'strict',
-      maxAge: oneDay,
-    });
-    res.cookie(HEADER_USER_ID, user_id, {
-      secure: isProd,
-      sameSite:  'strict',
-      maxAge: oneDay,
-    });
+    this.setToken(res, access_token, user_id, body.remember_me)
     return { access_token, user_id };
   }
 
@@ -81,17 +77,7 @@ export class AuthController {
       body,
       preRegisterToken
     );
-    res.cookie(ACCESS_TOKEN, access_token, {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: 'strict',
-      maxAge: oneDay,
-    });
-    res.cookie(HEADER_USER_ID, user_id, {
-      secure: isProd,
-      sameSite: 'strict',
-      maxAge: oneDay,
-    });
+    this.setToken(res, access_token, user_id, false)
     return {
       bizCode: CODE_SUCCESS,
       data: user
@@ -164,7 +150,31 @@ export class AuthController {
 
   @UseGuards(AuthGuard('jwt'))
   @Post('verify')
-  async verifyToken() {
+  async verifyToken(@Req() req: RequestWithUser, @Res({ passthrough: true }) res: Response) {
+    const { userId, phone } = req.user
+    const token = this.authService.refreshToken(userId, phone)
+    this.setToken(res, token, userId, true)
     return true;
+  }
+  setToken(res: Response, token, userId, remember: boolean = false) {
+    if (remember) {
+      res.cookie(ACCESS_TOKEN, token, {
+        secure: isProd,
+        sameSite: 'strict',
+        maxAge: oneMonth,
+      });
+      res.cookie(HEADER_USER_ID, userId, {
+        secure: isProd,
+        sameSite:  'strict',
+        maxAge: oneMonth,
+      });
+    } else {
+      res.cookie(ACCESS_TOKEN, token, {
+        secure: isProd,
+      });
+      res.cookie(HEADER_USER_ID, userId, {
+        secure: isProd,
+      });
+    }
   }
 }
