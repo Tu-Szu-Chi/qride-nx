@@ -10,7 +10,7 @@ export type ProductEntity = {
     model: string; // mapping to DB
 }
 
-export type ProductVO =  & {
+export type ProductVO = ProductEntity & {
     img?: string;
 } 
 
