@@ -12,7 +12,6 @@ import {
 } from '@nestjs/common';
 import {
   ACCESS_TOKEN,
-  CAPTCHA_KEY,
   CODE_SUCCESS,
   HEADER_PRE_TOKEN,
   HEADER_USER_ID,
@@ -31,7 +30,6 @@ import {
 import { OtpService } from './otp.service';
 import { OtpTypeEnum } from '@org/types';
 import { AuthGuard } from '@nestjs/passport';
-import { UserId } from '../../decorators/userId.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { RequestWithUser } from '../../types';
 

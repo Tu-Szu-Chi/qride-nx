@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import Header from '$/components/Header';
 import { ProductVO } from '@org/types';
-import { fromDateWithSlash } from '@org/common';
 import ProductCard from './card';
 
 const products: ProductVO[] = [
@@ -11,6 +10,7 @@ const products: ProductVO[] = [
     id: '11',
     user_id: 'user-id-1',
     vin: 'QEASE123',
+    year: 2002,
     engine_number: 'QQQ111',
     purchase_date: new Date('2024-01-01'),
     registration_date: new Date('2024-01-02'),
@@ -21,6 +21,7 @@ const products: ProductVO[] = [
     id: '12',
     user_id: 'user-id-1',
     vin: 'QEASE123',
+    year: 2002,
     engine_number: 'QQQ111',
     purchase_date: new Date('2024-01-01'),
     registration_date: new Date('2024-01-02'),
@@ -36,6 +37,7 @@ export default function Garage() {
     user_id: '',
     vin: '',
     engine_number: '',
+    year: NaN,
     purchase_date: new Date('1987-01-01'),
     registration_date: new Date('1987-01-02'),
     dealer_name: '',
