@@ -18,6 +18,7 @@ import DealerManagement from './pages/DealerManagement';
 import AdvertisementManagement from './pages/AdvertisementManagement';
 import CouponManagement from './pages/CouponManagement';
 import ReportData from './pages/ReportData';
+import PostManagement from './pages/PostManagement';
 
 const { Content } = Layout;
 
@@ -99,6 +100,14 @@ function App() {
               element={
                 <PrivateRoute allowedRoles={['admin']}>
                   <ReportData />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="post-management"
+              element={
+                <PrivateRoute allowedRoles={['admin', 'user']}>
+                  <PostManagement />
                 </PrivateRoute>
               }
             />

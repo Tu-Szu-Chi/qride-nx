@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Layout, Menu } from 'antd';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   DashboardOutlined,
   UserOutlined,
@@ -9,6 +9,7 @@ import {
   GiftOutlined,
   BarChartOutlined,
   LogoutOutlined,
+  FileTextOutlined,
 } from '@ant-design/icons';
 
 const { Sider } = Layout;
@@ -20,8 +21,37 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const userString = localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : null;
+
+  useEffect(() => {
+    const path = location.pathname;
+    const key = getKeyFromPath(path);
+    setSelectedKeys([key]);
+  }, [location]);
+
+  const getKeyFromPath = (path: string): string => {
+    switch (path) {
+      case '/dashboard':
+        return '1';
+      case '/members':
+        return '2';
+      case '/dealers':
+        return '3';
+      case '/advertisements':
+        return '4';
+      case '/coupons':
+        return '5';
+      case '/reports':
+        return '6';
+      case '/post-management':
+        return 'post-management';
+      default:
+        return '1';
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -41,7 +71,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => {
       }}
     >
       <div className="logo" />
-      <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
+      <Menu theme="dark" mode="inline" selectedKeys={selectedKeys}>
         <Menu.Item key="1" icon={<DashboardOutlined />}>
           <Link to="/dashboard">Dashboard</Link>
         </Menu.Item>
@@ -66,6 +96,9 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => {
             <Link to="/reports">Report Data</Link>
           </Menu.Item>
         )}
+        <Menu.Item key="post-management" icon={<FileTextOutlined />}>
+          <Link to="/post-management">Post Management</Link>
+        </Menu.Item>
         <Menu.Item key="7" icon={<LogoutOutlined />} onClick={handleLogout}>
           Logout
         </Menu.Item>
