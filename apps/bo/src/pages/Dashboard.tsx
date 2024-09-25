@@ -3,6 +3,7 @@ import { Card, Row, Col, Statistic } from 'antd';
 import { UserOutlined, ShopOutlined, DollarOutlined } from '@ant-design/icons';
 
 const Dashboard: React.FC = () => {
+  console.log('Dashboard component rendered'); // 添加這行來檢查組件是否被渲染
   return (
     <div>
       <h1>Dashboard</h1>
