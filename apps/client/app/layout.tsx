@@ -1,8 +1,10 @@
-'use client'
+'use client';
 
 import { PopupProvider } from '$/hooks/PopupProvider';
 import './global.css';
 import { StyledJsxRegistry } from './registry';
+import '@radix-ui/themes/styles.css';
+import { Theme } from '@radix-ui/themes';
 
 export default function RootLayout({
   children,
@@ -14,9 +16,11 @@ export default function RootLayout({
       <body>
         <PopupProvider>
           <StyledJsxRegistry>
-            <div className="h-screen">
-              <Wrapper>{children}</Wrapper>
-            </div>
+            <Theme>
+              <div className="h-screen">
+                <Wrapper>{children}</Wrapper>
+              </div>
+            </Theme>
           </StyledJsxRegistry>
         </PopupProvider>
       </body>
