@@ -54,7 +54,7 @@ const PostManagement: React.FC = () => {
   const [form] = Form.useForm();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  // const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [content, setContent] = useState('');
   const quillRef = useRef<ReactQuill>(null);
@@ -125,7 +125,7 @@ const PostManagement: React.FC = () => {
         );
         setPreviewImage(imageUrl);
         setCoverImageUrl(imageUrl);
-        setFileList([file]);
+        // setFileList([file]);
       } catch (error) {
         message.error('upload failed');
       }
@@ -184,7 +184,7 @@ const PostManagement: React.FC = () => {
     form.resetFields();
     setPreviewImage(null);
     setCoverImageUrl(null);
-    setFileList([]);
+    // setFileList([]);
     setContent('');
     setEditingPost(null);
   };

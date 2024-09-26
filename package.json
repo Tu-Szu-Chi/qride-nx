@@ -5,9 +5,12 @@
   "scripts": {
     "heroku-postbuild": "nx build $PROJECT_NAME --prod",
     "typeorm": "./node_modules/.bin/typeorm-ts-node-commonjs",
-    "migration:generate": "npm run typeorm -- migration:generate -d common/src/data-source.ts",
-    "migration:run": "npm run typeorm -- migration:run -d src/data-source.ts",
-    "migration:revert": "npm run typeorm -- migration:revert -d common/src/data-source.ts"
+    "migrate": "node db_migration/flyway.js migrate",
+    "clean": "node db_migration/flyway.js clean",
+    "info": "node db_migration/flyway.js info",
+    "validate": "node db_migration/flyway.js validate",
+    "baseline": "node db_migration/flyway.js baseline",
+    "repair": "node db_migration/flyway.js repair"
   },
   "private": true,
   "engines": {
