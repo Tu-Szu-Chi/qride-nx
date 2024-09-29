@@ -64,11 +64,11 @@ const ProductCard = ({ data }: { data: ProductVO }) => {
         </div>
         <div>
           <p >Purchase Date</p>
-          <p className="font-semibold">{fromDateWithSlash(purchase_date)}</p>
+          <p className="font-semibold">{purchase_date}</p>
         </div>
         <div>
           <p >Registration Date</p>
-          <p className="font-semibold">{fromDateWithSlash(registration_date)}</p>
+          <p className="font-semibold">{registration_date}</p>
         </div>
         <div>
           <p >Dealer Name</p>

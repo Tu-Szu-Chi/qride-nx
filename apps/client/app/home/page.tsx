@@ -6,12 +6,13 @@ import Header from '$/components/Header';
 import Carousel from '$/components/Carousel';
 import { ArticleTypeEnum } from '@org/types';
 import NewsItem from '$/components/News/item';
+import { useRouter } from 'next/navigation';
 
 const menuItems = [
-  { title: 'My Garage', icon: '🏠' },
-  { title: 'Register Bike', icon: '🚲' },
-  { title: 'Service Records', icon: '📋' },
-  { title: 'Coupons', icon: '🎟️' },
+  { title: 'My Garage', icon: '🏠', url: '/garage' },
+  { title: 'Register Bike', icon: '🚲', url: '' },
+  { title: 'Service Records', icon: '📋', url: '' },
+  { title: 'Coupons', icon: '🎟️', url: '' },
 ];
 const newsItems = [
   {
@@ -41,9 +42,7 @@ const newsItems = [
 
 
 export default function Index() {
-  useEffect(() => {
-    // check login status, if login-in, direct to /home
-  }, []);
+  const router = useRouter()
   return (
     <div className="w-full  min-h-full flex-1">
       <Header />
@@ -51,7 +50,9 @@ export default function Index() {
         <Carousel images={[]} className="mb-9" />
         <div className="grid grid-cols-2 gap-11">
           {menuItems.map((item, index) => (
-            <div key={index} className="flex flex-col items-center">
+            <div key={index} className="flex flex-col items-center" onClick={() => {
+              router.push(item.url)
+            }}>
               <div className="w-20 h-20 bg-gray-300 rounded-full flex items-center justify-center text-2xl mb-3">
                 {item.icon}
               </div>
