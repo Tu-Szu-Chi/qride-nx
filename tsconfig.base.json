@@ -17,7 +17,8 @@
     "paths": {
       "@org/common": ["common/src/index.ts"],
       "@org/types": ["types/src/index.ts"]
-    }
+    },
+    "typeRoots": ["./node_modules", "./types/src"]
   },
   "exclude": ["node_modules", "tmp"]
 }

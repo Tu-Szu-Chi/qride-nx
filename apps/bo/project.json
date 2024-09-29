@@ -37,31 +37,26 @@
         }
       }
     },
-    "preview": {
-      "executor": "@nx/vite:preview-server",
-      "defaultConfiguration": "development",
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "buildTarget": "bo:build"
-      },
-      "configurations": {
-        "development": {
-          "buildTarget": "bo:build:development"
-        },
-        "production": {
-          "buildTarget": "bo:build:production"
-        }
+        "lintFilePatterns": ["apps/bo/**/*.{ts,tsx,js,jsx}"]
       }
     },
     "test": {
-      "executor": "@nx/vite:test",
-      "outputs": ["{options.reportsDirectory}"],
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "reportsDirectory": "../../coverage/apps/bo"
+        "jestConfig": "apps/bo/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
       }
-    },
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"]
     }
   },
   "tags": []

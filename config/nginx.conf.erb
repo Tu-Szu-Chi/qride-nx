@@ -1,0 +1,38 @@
+daemon off;
+pid /app/nginx.pid;
+worker_processes <%= ENV['NGINX_WORKERS'] || 4 %>;
+error_log stderr info;
+
+events {
+    use epoll;
+    accept_mutex on;
+    worker_connections <%= ENV['NGINX_WORKER_CONNECTIONS'] || 1024 %>;
+}
+
+http {
+    gzip on;
+    gzip_comp_level 2;
+    gzip_min_length 512;
+
+    server_tokens off;
+
+    log_format l2met 'measure#nginx.service=$request_time request_id=$http_x_request_id';
+    access_log <%= ENV['NGINX_ACCESS_LOG_PATH'] || '/dev/stdout' %> l2met;
+
+    include mime.types;
+    default_type application/octet-stream;
+    sendfile on;
+
+    client_body_timeout 5;
+
+    server {
+        listen <%= ENV["PORT"] %>;
+        port_in_redirect off;
+        keepalive_timeout 5;
+        root /app/dist/apps/bo;
+
+        location / {
+            try_files $uri $uri/ /index.html;
+        }
+    }
+}
