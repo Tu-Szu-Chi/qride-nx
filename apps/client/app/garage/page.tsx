@@ -37,6 +37,7 @@ export default function Garage() {
     <GarageEdit
       data={editData}
       onCancel={() => {
+        handleFetch()
         setEditData(null);
         setIsEditMode(false);
       }}
