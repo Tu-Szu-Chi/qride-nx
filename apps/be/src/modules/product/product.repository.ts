@@ -73,7 +73,7 @@ export class ProductRepository {
   }
   async update(
     id: string,
-    productUpdateDto: ProductUpdateDto
+    productUpdateDto: ProductUpdateDto['data']
   ): Promise<ProductEntity> {
     const productToUpdate = Object.fromEntries(
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -89,5 +89,15 @@ export class ProductRepository {
       .returning('id');
 
     return await this.findById(obj.id);
+  }
+  async remove(userId: string, id: string): Promise<void> {
+    const query = `
+      DELETE FROM product
+      WHERE id = $1
+      AND user_id = $2
+    `
+    await this.pool.query(query, [id, userId])
+    // rowCount should be 1
+
   }
 }

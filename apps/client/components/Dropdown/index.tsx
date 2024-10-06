@@ -7,18 +7,17 @@ type Option = {
 }
 interface Props extends FieldAttributes<any> {
   options: Option[];
-  label: string;
   children?: React.ReactNode;
 }
 
-const DropdownField: React.FC<Props> = ({name, options, placeholder, label, children, className, ...rest}) => {
+const DropdownField: React.FC<Props> = ({name, options, placeholder, children, className, ...rest}) => {
   return (
-    <div>
+    <div className='flex items-center justify-between'>
       <Field
         as="select"
         id={name}
         name={name}
-        className={`appearance-none focus:outline-none ${className}`}
+        className={`w-full appearance-none focus:outline-none ${className}`}
         {...rest}
       >
         {placeholder && (
@@ -33,6 +32,7 @@ const DropdownField: React.FC<Props> = ({name, options, placeholder, label, chil
         ))}
       </Field>
       {children}
+        <img src="/assets/arrow_down.png" />
     </div>
   );
 };

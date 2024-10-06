@@ -1,9 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { ProductVO } from '@org/types';
-import { fromDateWithSlash } from '@org/common';
-import { useRouter } from 'next/navigation';
 import { css } from '@emotion/css';
 
 const rowCss = css`
@@ -14,9 +12,8 @@ const rowCss = css`
   padding-left: 12px;
 }
 `
-console.log(rowCss)
 
-const ProductCard = ({ data }: { data: ProductVO }) => {
+const ProductCard = ({ data, handleEdit }: { data: ProductVO, handleEdit: (data: ProductVO) => void }) => {
   const {
     model,
     registration_date,
@@ -27,13 +24,11 @@ const ProductCard = ({ data }: { data: ProductVO }) => {
     dealer_name,
   } = data;
 
-  const router = useRouter();
-
   return (
     <div>
       <div className="flex items-end relative bg-gray-200 h-40">
         <div className="ml-9">
-          <p className="text-xl font-light text-white">{2022}</p>
+          <p className="text-xl font-light text-white">{data.year}</p>
           <h2 className="text-3xl font-black text-primary-500">{model}</h2>
         </div>
         <img
@@ -41,7 +36,7 @@ const ProductCard = ({ data }: { data: ProductVO }) => {
           src="/assets/edit.png"
           alt="edit"
           onClick={() => {
-            router.push(`garage/${id}/edit`);
+            handleEdit(data)
           }}
           style={{
             right: 24,

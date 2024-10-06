@@ -16,4 +16,11 @@ export type ProductVO = ProductEntity & {
 
 export type ProductDto = Omit<ProductEntity, 'user_id' >
 
-export type ProductUpdateDto = Pick<ProductEntity, 'year' | 'vin' | 'engine_number' | 'purchase_date' | 'registration_date' | 'dealer_name'>
+export type ProductUpdateDto =  {
+    id: string,
+    data: Partial<Pick<ProductEntity, 'year' | 'vin' | 'engine_number' | 'purchase_date' | 'registration_date' | 'dealer_name'>>
+}
+
+export type ProductRemoveDto = {
+    id: string
+}

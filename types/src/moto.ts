@@ -18,3 +18,8 @@ export type DealerEntity = {
 export enum DealerBizType {
     DEFAULT = 'DEFAULT'
 }
+
+export type ModelVO = {
+    id: number;
+    title: string;
+}

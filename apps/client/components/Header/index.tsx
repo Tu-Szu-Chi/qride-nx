@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation';
 type Props = BaseHTMLAttributes<HTMLDivElement> & {
   title?: string;
   useBackBtn?: boolean;
+  customBackAction?: () => void;
   customBtn?: ReactNode;
 };
-const Header: React.FC<Props> = ({ title, useBackBtn, customBtn }) => {
+const Header: React.FC<Props> = ({ title, useBackBtn, customBtn, customBackAction }) => {
   const router = useRouter();
   const [isOpen, toggleOpen] = useState<boolean>(false);
   return (
@@ -25,7 +26,7 @@ const Header: React.FC<Props> = ({ title, useBackBtn, customBtn }) => {
       >
         <div className="container mx-auto flex justify-between items-center">
           {useBackBtn ? (
-            <img src="/assets/arrow_left.svg" onClick={() => router.back()} />
+            <img src="/assets/arrow_left.svg" onClick={() => customBackAction ? customBackAction() : router.back()} />
           ) : (
             <button
               className="text-2xl"

@@ -1,15 +1,18 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Header from '$/components/Header';
 import { ProductVO } from '@org/types';
 import ProductCard from './card';
 import { useRouter } from 'next/navigation';
 import API from '$/utils/fetch';
+import GarageEdit from './edit';
 
 export default function Garage() {
-  const router = useRouter()
+  const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState<boolean>(false);
+  const [editData, setEditData] = useState<ProductVO | null>(null);
   const [products, setProducts] = useState<ProductVO[]>([]);
   const [currentProduct, setCurrentProduct] = useState<ProductVO>({
     id: '',
@@ -22,13 +25,28 @@ export default function Garage() {
     dealer_name: '',
     model: '',
   });
+  const handleFetch = useCallback(() => {
+    API.get<ProductVO[]>('/product/list').then((res) => {
+      setProducts(res);
+    });
+  }, []);
   useEffect(() => {
-    API.get<ProductVO[]>('/product/list')
-    .then(res => {
-        setProducts(res)
-    })
-  }, [])
-  return (
+    handleFetch();
+  }, []);
+  return isEditMode && editData ? (
+    <GarageEdit
+      data={editData}
+      onCancel={() => {
+        setEditData(null);
+        setIsEditMode(false);
+      }}
+      onRemove={() => {
+        handleFetch()
+        setEditData(null);
+        setIsEditMode(false);
+      }}
+    />
+  ) : (
     <div className="w-full  min-h-full flex-1">
       <Header title="My Garage" />
       <div className="px-6 py-4">
@@ -52,19 +70,29 @@ export default function Garage() {
               </div>
             ))}
             <div className="mt-6 flex justify-center">
-              <img src="/assets/add.png" alt="add" className="w-6" onClick={() => {
-                router.push("/garage/add")
-              }} />
+              <img
+                src="/assets/add.png"
+                alt="add"
+                className="w-6"
+                onClick={() => {
+                  router.push('/garage/add');
+                }}
+              />
             </div>
           </div>
         </div>
         {isModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-50"
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-50"
             onClick={() => setIsModalOpen(false)}
           >
             <div className="rounded-3xl overflow-hidden shadow-xl max-w-sm w-full m-4">
               <ProductCard
                 data={currentProduct}
+                handleEdit={(data) => {
+                  setEditData(data);
+                  setIsEditMode(true);
+                }}
               />
             </div>
           </div>
