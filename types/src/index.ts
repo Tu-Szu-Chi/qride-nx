@@ -4,6 +4,7 @@ export * from './user';
 export * from './article'
 export * from './product'
 export * from './moto'
+export * from './bo/index'
 
 export interface Error {
     bizCode: number;

@@ -3,11 +3,11 @@
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
     "types": [
-      "@nx/react/typings/styled-jsx.d.ts",
-      "@nx/react/typings/cssmodule.d.ts",
-      "@nx/react/typings/image.d.ts",
-      "vite/client"
-    ]
+      "node"
+    ],
+    "module": "commonjs",
+    "emitDecoratorMetadata": true,
+    "target": "es2021"
   },
   "exclude": [
     "src/**/*.spec.ts",

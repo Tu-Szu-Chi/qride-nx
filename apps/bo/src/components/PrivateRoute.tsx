@@ -1,5 +1,6 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { BoUser, Role } from '@org/types'
 
 interface PrivateRouteProps {
   children: React.ReactNode;
@@ -12,7 +13,9 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
 }) => {
   const location = useLocation();
   const userString = localStorage.getItem('user');
-  const user = userString ? JSON.parse(userString) : null;
+  const user: BoUser = userString ? JSON.parse(userString) : null;
+  
+  if (!allowedRoles) allowedRoles = [Role.ADMIN] //! TODO
 
   console.log('PrivateRoute: User', user); // 添加這行來檢查用戶信息
   console.log('PrivateRoute: Allowed Roles', allowedRoles); // 添加這行來檢查允許的角色

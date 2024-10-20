@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   BrowserRouter as Router,
   Route,
@@ -19,6 +19,7 @@ import AdvertisementManagement from './pages/AdvertisementManagement';
 import CouponManagement from './pages/CouponManagement';
 import ReportData from './pages/ReportData';
 import PostManagement from './pages/PostManagement';
+import API from './utils/fetch';
 
 const { Content } = Layout;
 
@@ -36,6 +37,12 @@ const MainLayout = ({ collapsed }: { collapsed: boolean }) => (
 
 function App() {
   const [collapsed, setCollapsed] = useState(false);
+  useEffect(() => {
+    API.get('/test')
+    .then(res => {
+      console.log(res)
+    })
+  }, [])
 
   return (
     <ConfigProvider locale={enUS}>

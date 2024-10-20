@@ -11,6 +11,11 @@
     }
   ],
   "compilerOptions": {
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "paths": {
+      "@org/common": ["common/src/index.ts"],
+      "@org/types": ["types/src/index.ts"],
+      "$/*": ["./apps/be/src/*"],
+    },
   }
 }
