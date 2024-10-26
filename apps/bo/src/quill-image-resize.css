@@ -1,0 +1,45 @@
+
+
+.ql-editor img {
+  display: block;
+  max-width: 100%;
+}
+
+.ql-editor .image-resizer {
+  box-sizing: border-box;
+  border: 1px dashed #444;
+  position: absolute;
+}
+
+.ql-editor .image-resizer .resize-handle {
+  box-sizing: border-box;
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  background-color: #444;
+  border: 1px solid #fff;
+}
+
+.ql-editor .image-resizer .resize-handle.se {
+  right: -5px;
+  bottom: -5px;
+  cursor: se-resize;
+}
+
+.ql-editor .image-resizer .resize-handle.sw {
+  left: -5px;
+  bottom: -5px;
+  cursor: sw-resize;
+}
+
+.ql-editor .image-resizer .resize-handle.ne {
+  right: -5px;
+  top: -5px;
+  cursor: ne-resize;
+}
+
+.ql-editor .image-resizer .resize-handle.nw {
+  left: -5px;
+  top: -5px;
+  cursor: nw-resize;
+}

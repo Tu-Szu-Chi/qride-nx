@@ -7,17 +7,19 @@ import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import cookieParser from 'cookie-parser';
+import { join } from 'path';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const globalPrefix = 'api';
   const port = process.env.PORT || 3000;
-  
-  const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
-  
+
+  const whitelist = ['http://localhost:4200', 'http://localhost:5173'];
+
   app.enableCors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      if (!origin || whitelist.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
@@ -28,8 +30,11 @@ async function bootstrap() {
   });
 
   app.setGlobalPrefix(globalPrefix);
-  app.use(cookieParser())
+  app.use(cookieParser());
 
+  app.useStaticAssets(join(process.cwd(), 'uploads'), {
+    prefix: '/uploads/',
+  });
 
   await app.listen(port);
   Logger.log(

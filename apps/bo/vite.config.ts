@@ -14,7 +14,21 @@ export default defineConfig(async () => {
         '/api/bo': {
           target: process.env.BO_PUBLIC_API_URL,
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/bo/, ''),
+          configure: (proxy, options) => {
+            proxy.on('proxyReq', (proxyReq, req, res) => {
+              console.log(
+                'Proxying:',
+                req.method,
+                req.url,
+                '->',
+                options.target + proxyReq.path
+              );
+            });
+          },
+        },
+        '/uploads': {
+          target: process.env.BO_PUBLIC_API_URL,
+          changeOrigin: true,
         },
       },
     },

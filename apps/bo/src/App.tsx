@@ -37,12 +37,12 @@ const MainLayout = ({ collapsed }: { collapsed: boolean }) => (
 
 function App() {
   const [collapsed, setCollapsed] = useState(false);
-  useEffect(() => {
-    API.get('/test')
-    .then(res => {
-      console.log(res)
-    })
-  }, [])
+  // useEffect(() => {
+  //   API.get('/test')
+  //   .then(res => {
+  //     console.log(res)
+  //   })
+  // }, [])
 
   return (
     <ConfigProvider locale={enUS}>
