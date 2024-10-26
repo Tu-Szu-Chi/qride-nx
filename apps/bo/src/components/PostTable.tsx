@@ -1,7 +1,7 @@
 import React from 'react';
-import { Table, Button } from 'antd';
+import { Table, Button, Tag } from 'antd';
 import { EditOutlined } from '@ant-design/icons';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { Post } from '../types/post';
 import { TableRowSelection } from 'antd/es/table/interface';
 
@@ -16,6 +16,19 @@ interface PostTableProps {
   rowSelection: TableRowSelection<Post>;
 }
 
+const getCategoryColor = (category: string) => {
+  switch (category) {
+    case 'News':
+      return '#1890ff';
+    case 'Promo':
+      return '#52c41a';
+    case 'Event':
+      return '#faad14';
+    default:
+      return '#d9d9d9';
+  }
+};
+
 const PostTable: React.FC<PostTableProps> = ({
   posts,
   loading,
@@ -28,7 +41,19 @@ const PostTable: React.FC<PostTableProps> = ({
 }) => {
   const columns = [
     { title: 'Title', dataIndex: 'title', key: 'title' },
-    { title: 'Category', dataIndex: 'category', key: 'category' },
+    {
+      title: 'Category',
+      dataIndex: 'category',
+      key: 'category',
+      render: (category: string) => (
+        <Tag
+          color={getCategoryColor(category)}
+          style={{ color: 'white', fontWeight: 'bold' }}
+        >
+          {category.toUpperCase()}
+        </Tag>
+      ),
+    },
     {
       title: 'Status',
       dataIndex: 'isActive',
@@ -39,7 +64,7 @@ const PostTable: React.FC<PostTableProps> = ({
       title: 'Publish Date Range',
       key: 'publishDateRange',
       render: (_: unknown, record: Post) =>
-        `${moment(record.publishStartDate).format('YYYY-MM-DD')} - ${moment(
+        `${dayjs(record.publishStartDate).format('YYYY-MM-DD')} - ${dayjs(
           record.publishEndDate
         ).format('YYYY-MM-DD')}`,
     },

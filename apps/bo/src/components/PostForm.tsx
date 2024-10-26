@@ -237,7 +237,7 @@ const PostForm: React.FC<PostFormProps> = ({
             >
               <RangePicker
                 showTime
-                format="YYYY-MM-DD HH:mm:ss"
+                format="YYYY-MM-DD HH A"
                 use12Hours
                 allowClear={false}
               />
