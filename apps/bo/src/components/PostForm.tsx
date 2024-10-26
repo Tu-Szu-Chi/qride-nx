@@ -59,6 +59,7 @@ const PostForm: React.FC<PostFormProps> = ({
           dayjs.utc(initialValues.publishEndDate),
         ],
       });
+      console.log('🚀 ~ useEffect ~ initialValues:', initialValues.content);
       setContent(initialValues.content);
       setPreviewImage(initialValues.coverImage);
       setCoverImageUrl(initialValues.coverImage);
@@ -131,6 +132,7 @@ const PostForm: React.FC<PostFormProps> = ({
   const handleSubmit = (values: FormValues) => {
     const [publishStartDate, publishEndDate] = values.publishDateRange;
     const contentHtml = quillRef.current?.getEditor().root.innerHTML;
+    console.log('🚀 ~ handleSubmit ~ contentHtml:', contentHtml);
 
     const postData = {
       ...values,
@@ -238,7 +240,6 @@ const PostForm: React.FC<PostFormProps> = ({
               <RangePicker
                 showTime
                 format="YYYY-MM-DD HH A"
-                use12Hours
                 allowClear={false}
               />
             </Form.Item>
