@@ -16,12 +16,15 @@ import { PlusOutlined } from '@ant-design/icons';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import '../quill-image-resize.css';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 import { uploadImage } from '../services/api';
 import { FormValues, Post } from '../types/post';
 import { quillFormats, createQuillModules } from '../config/quillConfig';
 import { UploadChangeParam } from 'antd/lib/upload';
 import { UploadFile } from 'antd/es/upload/interface';
+
+dayjs.extend(utc);
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -47,14 +50,13 @@ const PostForm: React.FC<PostFormProps> = ({
   const [content, setContent] = useState(initialValues?.content || '');
   const quillRef = useRef<ReactQuill>(null);
 
-  // Use useEffect to update form values when initialValues change
   useEffect(() => {
     if (initialValues) {
       form.setFieldsValue({
         ...initialValues,
         publishDateRange: [
-          moment(initialValues.publishStartDate),
-          moment(initialValues.publishEndDate),
+          dayjs.utc(initialValues.publishStartDate),
+          dayjs.utc(initialValues.publishEndDate),
         ],
       });
       setContent(initialValues.content);
@@ -134,8 +136,8 @@ const PostForm: React.FC<PostFormProps> = ({
       ...values,
       content: contentHtml,
       coverImage: coverImageUrl,
-      publishStartDate: publishStartDate.toDate(),
-      publishEndDate: publishEndDate.toDate(),
+      publishStartDate: publishStartDate.utc().toDate(),
+      publishEndDate: publishEndDate.utc().toDate(),
     };
     delete postData.publishDateRange;
 
@@ -233,7 +235,12 @@ const PostForm: React.FC<PostFormProps> = ({
                 },
               ]}
             >
-              <RangePicker />
+              <RangePicker
+                showTime
+                format="YYYY-MM-DD HH:mm:ss"
+                use12Hours
+                allowClear={false}
+              />
             </Form.Item>
           </Col>
         </Row>
