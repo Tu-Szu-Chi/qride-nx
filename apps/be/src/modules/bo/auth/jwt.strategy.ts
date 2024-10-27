@@ -2,13 +2,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-
-interface JwtPayload {
-  sub: string;
-  phone: string;
-  iat: number;
-  exp: number;
-}
+import { BoRole } from '@org/types';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -20,13 +14,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: JwtPayload) {
-    // if (user.isBanned) {
-    //   throw new UnauthorizedException('User is banned');
-    // }
-    if (!payload.sub || !payload.phone) {
+  async validate(payload: any) {
+    if (!payload.sub || !payload.username || !payload.role) {
       throw new UnauthorizedException();
     }
-    return { userId: payload.sub, phone: payload.phone };
+    return {
+      userId: payload.sub,
+      username: payload.username,
+      role: payload.role as BoRole,
+    };
   }
 }

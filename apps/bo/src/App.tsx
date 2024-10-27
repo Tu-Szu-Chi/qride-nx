@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   BrowserRouter as Router,
   Route,
@@ -19,7 +19,8 @@ import AdvertisementManagement from './pages/AdvertisementManagement';
 import CouponManagement from './pages/CouponManagement';
 import ReportData from './pages/ReportData';
 import PostManagement from './pages/PostManagement';
-import API from './utils/fetch';
+import { BoRole } from '@org/types';
+import CreateUser from './pages/CreateUser';
 
 const { Content } = Layout;
 
@@ -37,12 +38,6 @@ const MainLayout = ({ collapsed }: { collapsed: boolean }) => (
 
 function App() {
   const [collapsed, setCollapsed] = useState(false);
-  // useEffect(() => {
-  //   API.get('/test')
-  //   .then(res => {
-  //     console.log(res)
-  //   })
-  // }, [])
 
   return (
     <ConfigProvider locale={enUS}>
@@ -65,7 +60,7 @@ function App() {
             <Route
               path="dashboard"
               element={
-                <PrivateRoute allowedRoles={['admin', 'user']}>
+                <PrivateRoute allowedRoles={[BoRole.ADMIN, BoRole.AGENT]}>
                   <Dashboard />
                 </PrivateRoute>
               }
@@ -73,7 +68,7 @@ function App() {
             <Route
               path="members"
               element={
-                <PrivateRoute allowedRoles={['admin']}>
+                <PrivateRoute allowedRoles={[BoRole.ADMIN]}>
                   <MemberManagement />
                 </PrivateRoute>
               }
@@ -81,7 +76,7 @@ function App() {
             <Route
               path="dealers"
               element={
-                <PrivateRoute allowedRoles={['admin']}>
+                <PrivateRoute allowedRoles={[BoRole.ADMIN]}>
                   <DealerManagement />
                 </PrivateRoute>
               }
@@ -89,7 +84,7 @@ function App() {
             <Route
               path="advertisements"
               element={
-                <PrivateRoute allowedRoles={['admin', 'user']}>
+                <PrivateRoute allowedRoles={[BoRole.ADMIN, BoRole.AGENT]}>
                   <AdvertisementManagement />
                 </PrivateRoute>
               }
@@ -97,7 +92,7 @@ function App() {
             <Route
               path="coupons"
               element={
-                <PrivateRoute allowedRoles={['admin', 'user']}>
+                <PrivateRoute allowedRoles={[BoRole.ADMIN, BoRole.AGENT]}>
                   <CouponManagement />
                 </PrivateRoute>
               }
@@ -105,7 +100,7 @@ function App() {
             <Route
               path="reports"
               element={
-                <PrivateRoute allowedRoles={['admin']}>
+                <PrivateRoute allowedRoles={[BoRole.ADMIN]}>
                   <ReportData />
                 </PrivateRoute>
               }
@@ -113,8 +108,16 @@ function App() {
             <Route
               path="post-management"
               element={
-                <PrivateRoute allowedRoles={['admin', 'user']}>
+                <PrivateRoute allowedRoles={[BoRole.ADMIN, BoRole.AGENT]}>
                   <PostManagement />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="create-user"
+              element={
+                <PrivateRoute allowedRoles={[BoRole.ADMIN]}>
+                  <CreateUser />
                 </PrivateRoute>
               }
             />

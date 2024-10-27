@@ -8,11 +8,17 @@ import {
   Delete,
   Query,
   Logger,
+  UseGuards,
 } from '@nestjs/common';
 import { PostsService } from '$/modules/posts/posts.service';
 import { CreatePostDto, UpdatePostDto } from './posts.dto';
+import { JwtAuthGuard } from '$/modules/bo/auth/jwt-auth.guard';
+import { RolesGuard } from '$/modules/bo/auth/roles.guard';
+import { Roles } from '$/modules/bo/auth/roles.decorator';
+import { BoRole } from '@org/types';
 
-@Controller('posts')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Controller()
 export class PostsController {
   private readonly logger = new Logger(PostsController.name);
 
@@ -26,6 +32,7 @@ export class PostsController {
     return this.postsService.create(createPostDto);
   }
 
+  @Roles(BoRole.AGENT)
   @Get()
   findAll(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
     return this.postsService.findAll(page, limit);

@@ -1,11 +1,7 @@
-import {
-  Controller,
-  Get,
-  Logger,
-} from '@nestjs/common';
+import { Controller, Get, Logger } from '@nestjs/common';
 import { PostsService } from '$/modules/posts/posts.service';
 
-@Controller('posts')
+@Controller()
 export class PostsController {
   private readonly logger = new Logger(PostsController.name);
 
