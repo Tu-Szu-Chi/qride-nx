@@ -1,37 +1,29 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import { BoLoginDto } from '@org/types';
+import API from '../utils/fetch';
 
 const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const onFinish = (values: { username: string; password: string }) => {
+  const onFinish = async (values: BoLoginDto) => {
     setLoading(true);
-    // 模擬 API 請求
-    setTimeout(() => {
-      if (values.username === 'admin' && values.password === 'password') {
-        localStorage.setItem(
-          'user',
-          JSON.stringify({ username: 'admin', role: 'admin' })
-        );
-        navigate('/');
-      } else if (values.username === 'user' && values.password === 'password') {
-        localStorage.setItem(
-          'user',
-          JSON.stringify({ username: 'user', role: 'user' })
-        );
-        navigate('/');
-      } else {
-        message.error('Invalid username or password');
-      }
+    try {
+      const response = await API.login(values);
+      localStorage.setItem('user', JSON.stringify(response.user));
+      navigate('/');
+    } catch (error) {
+      message.error('Invalid username or password');
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
     <div style={{ maxWidth: 300, margin: '100px auto' }}>
-      <h1>Login</h1>
+      <h1>BO Login</h1>
       <Form name="basic" initialValues={{ remember: true }} onFinish={onFinish}>
         <Form.Item
           name="username"

@@ -1,201 +1,99 @@
 import {
-  BadRequestException,
   Injectable,
   UnauthorizedException,
+  BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserService } from '../../user/user.service';
-import {
-  RegisterDto,
-  ResetPasswordDto,
-  User,
-  UserSourceType,
-  UserType,
-  UserVO,
-} from '@org/types';
-
 import * as bcrypt from 'bcrypt';
-import { isNull, omit } from 'lodash';
-import axios from 'axios';
-import {
-  CODE_SUCCESS,
-  INVALID_PAYLOAD,
-  alphaMax50Regex,
-  birthdayRegex,
-  emailRegex,
-  passwordRegex,
-  phoneRegex,
-} from '@org/common';
-
-type AuthSuccessBO = {
-  access_token: string;
-  user_id: string;
-};
+import { BoUser, BoAuthResponse, CreateBoUserDto } from '@org/types';
+import { ConfigService } from '@nestjs/config';
+import { BoAuthRepository } from './auth.repository';
 
 @Injectable()
-export class AuthService {
+export class BoAuthService {
+  private readonly logger = new Logger(BoAuthService.name);
+
   constructor(
-    private userService: UserService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
+    private configService: ConfigService,
+    private boAuthRepository: BoAuthRepository
   ) {}
 
-  async login(phone: string, password: string): Promise<AuthSuccessBO> {
-    const user = await this.validateUser(phone, password);
-    if (!user) {
-      throw new UnauthorizedException();
-    }
-
-    return {
-      access_token: this.signToken(phone, user.id),
-      user_id: user.id,
-    };
-  }
-
-  async register(
-    payload: RegisterDto,
-    token: string
-  ): Promise<AuthSuccessBO & { user: UserVO }> {
-    // 1. verify token
-    // const { type, verified, phone }: OtpJwtPayload =
-    //   this.jwtService.verify(token);
-    // if (
-    //   type != OtpTypeEnum.REGISTER ||
-    //   verified != true ||
-    //   phone != payload.phone
-    // )
-    //   throw new UnauthorizedException();
-
-    // this.validateRegisterPayload(payload);
-
-    // const hashedPassword = await this.hashedPassword(payload.password);
-    // const userVO = await this.userService.create(payload, hashedPassword);
-    // 在實際應用中,您需要發送OTP給用戶(例如通過電子郵件或短信)
-    // return {
-    //   access_token: this.signToken(userVO.phone, userVO.id),
-    //   user_id: userVO.id,
-    //   user: userVO,
-    // };
-    return Promise.resolve({
-        access_token: '',
-        user_id: '',
-        user: null
-    })
-  }
-  async isPhoneExist(phone: string): Promise<boolean> {
-    const userEntity = await this.userService.findOne(phone)
-    return !isNull(userEntity)
-  }
-  refreshToken(userId: string, phone: string) {
-    return this.signToken(phone, userId)
-  }
-  async resetPassword(payload: ResetPasswordDto, token: string) {
-    // const { type, verified, phone }: OtpJwtPayload =
-    //   this.jwtService.verify(token);
-      
-    // if (
-    //   type != OtpTypeEnum.RESET_PASSWORD ||
-    //   verified != true ||
-    //   !phoneRegex.test(phone)
-    // )
-    //   throw new UnauthorizedException();
-
-    // const { password, re_password } = payload;
-    // if (password != re_password || !passwordRegex.test(password)) {
-    //   return { bizCode: INVALID_PAYLOAD, data: { error: { type: 'password', message: 'Invalid Password'} }}
-    // }
-
-    // const hashedPassword = await this.hashedPassword(payload.password);
-    // const userEntity = await this.userService.findOne(phone);
-    // if (isNull(userEntity)) throw new BadRequestException('Not found user');
-    // await this.userService.updatePassword(userEntity.id, hashedPassword);
-    return {
-      bizCode: CODE_SUCCESS,
-      data: true
-    };
-  }
-  async verifyRecaptcha(recaptchaResponse) {
-    const secretKey = 'YOUR_SECRET_KEY';
-    const verifyUrl = 'https://www.google.com/recaptcha/api/siteverify';
-
-    try {
-      const response = await axios.post(verifyUrl, null, {
-        params: {
-          secret: secretKey,
-          response: recaptchaResponse,
-        },
-      });
-      return response.data.success;
-    } catch (error) {
-      console.error('reCAPTCHA verification error:', error);
-      return false;
-    }
-  }
-  private async validateUser(
-    phone: string,
+  async validateUser(
+    username: string,
     password: string
-  ): Promise<Partial<User> | undefined> {
-    const user = await this.userService.findOne(phone);
- 
-    if (user && (await bcrypt.compare(password, user.password))) {
-      return omit(user, 'password');
+  ): Promise<Omit<BoUser, 'password'> | null> {
+    this.logger.log(`Validating user: ${username}`);
+    try {
+      const user = await this.boAuthRepository.findUserByUsername(username);
+      if (user && (await bcrypt.compare(password, user.password))) {
+        this.logger.log(`User ${username} validated successfully`);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { password, ...result } = user;
+        return result;
+      }
+      this.logger.warn(`Validation failed for user: ${username}`);
+      return null;
+    } catch (error) {
+      this.logger.error(`Error validating user: ${error.message}`, error.stack);
+      throw error;
     }
-    return null;
   }
-  private validateRegisterPayload(payload: RegisterDto) {
-    const {
-      phone,
-      type,
-      password,
-      rePassword: re_password,
-      firstName: first_name,
-      midName: mid_name = '',
-      lastName: last_name,
-      addressCity: address_city,
-      addressState: address_state,
-      addressDetail: address_detail = '',
-      birthday = '',
-      source = NaN,
-      email = '',
-    } = payload;
-    const badRequestGenerator = (message: string = '', type: string) =>
-      new BadRequestException({ bizCode: INVALID_PAYLOAD, data: { error: {type, message}} });
-    // 1. validate phone format
-    if (!phoneRegex.test(phone)) throw badRequestGenerator('Invalid phone', 'phone');
-    if (!Object.values(UserType).includes(type)) throw badRequestGenerator('Invalid user-type', 'type');
-    if (!passwordRegex.test(password))
-      throw badRequestGenerator('Invalid password', 'password');
-    if (password != re_password) throw badRequestGenerator('Unconfirmed password', 're_password');
-    // ! need improvement
-    if (
-      !alphaMax50Regex.test(first_name) ||
-      !alphaMax50Regex.test(last_name) ||
-      (mid_name != '' && !alphaMax50Regex.test(mid_name))
-    )
-      throw badRequestGenerator('Invalid name', 'first_name');
-    if (
-      !alphaMax50Regex.test(address_city) ||
-      !alphaMax50Regex.test(address_state) ||
-      (address_detail != '' && !alphaMax50Regex.test(address_detail))
-    )
-      throw badRequestGenerator('Invalid address', 'address_city');
-    if (birthday != '' && !birthdayRegex.test(birthday))
-      throw badRequestGenerator('Invalid birthday', 'birthday');
-    if (
-      !Number.isNaN(source) &&
-      !Object.values(UserSourceType).includes(source)
-    )
-      throw badRequestGenerator('Invalid source', 'source');
-    if (email != '' && !emailRegex.test(email))
-      throw badRequestGenerator('Invalid email', 'email');
-    // whatsapp
-    // facebook
+
+  async login(user: Omit<BoUser, 'password'>): Promise<BoAuthResponse> {
+    const payload = { username: user.username, sub: user.id, role: user.role };
+    const accessToken = this.jwtService.sign(payload);
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+
+    await this.boAuthRepository.saveRefreshToken(user.id, refreshToken);
+
+    return {
+      accessToken,
+      refreshToken,
+      user,
+    };
   }
-  private signToken(phone: string, id: string): string {
-    const payload = { phone: phone, sub: id };
-    return this.jwtService.sign(payload);
+
+  async createUser(
+    createUserDto: CreateBoUserDto
+  ): Promise<Omit<BoUser, 'password'>> {
+    const existingUser = await this.boAuthRepository.findUserByUsername(
+      createUserDto.username
+    );
+    if (existingUser) {
+      throw new BadRequestException('Username already exists');
+    }
+
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+    return this.boAuthRepository.createUser({
+      ...createUserDto,
+      password: hashedPassword,
+    });
   }
-  private async hashedPassword(password: string): Promise<string> {
-    const PasswordSalt = 10;
-    return await bcrypt.hash(password, PasswordSalt);
+
+  async logout(userId: string): Promise<void> {
+    await this.boAuthRepository.deleteRefreshToken(userId);
+  }
+
+  async refreshToken(refreshToken: string): Promise<BoAuthResponse> {
+    try {
+      const payload = this.jwtService.verify(refreshToken);
+      const storedToken = await this.boAuthRepository.getStoredRefreshToken(
+        payload.sub
+      );
+
+      if (storedToken !== refreshToken) {
+        throw new UnauthorizedException('Invalid refresh token');
+      }
+
+      const user = await this.boAuthRepository.getUserById(payload.sub);
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+      return this.login(user);
+    } catch (error) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
   }
 }
