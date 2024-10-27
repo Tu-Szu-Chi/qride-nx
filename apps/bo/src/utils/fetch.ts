@@ -6,9 +6,15 @@ import {
   BoUser,
   CreateBoUserDto,
 } from '@org/types';
+import { Post, UploadImageResponse, GetPostsResponse } from '../types/index';
 
 class Api {
   private instance: AxiosInstance;
+  private isRefreshing = false;
+  private failedQueue: Array<{
+    resolve: (value?: unknown) => void;
+    reject: (reason?: unknown) => void;
+  }> = [];
 
   constructor(baseURL: string) {
     this.instance = axios.create({
@@ -37,25 +43,68 @@ class Api {
       (response) => response,
       async (error) => {
         const originalRequest = error.config;
-        if (error.response.status === 401 && !originalRequest._retry) {
-          originalRequest._retry = true;
-          try {
-            const refreshToken = localStorage.getItem('refresh_token');
-            const response = await this.refreshToken(refreshToken);
-            this.setToken(response.access_token, response.refresh_token);
-            originalRequest.headers[
-              'Authorization'
-            ] = `Bearer ${response.access_token}`;
-            return this.instance(originalRequest);
-          } catch (refreshError) {
-            this.clearToken();
-            window.location.href = '/login';
-            return Promise.reject(refreshError);
-          }
+
+        // 如果是刷新 token 的請求失敗，直接返回錯誤
+        if (originalRequest.url === '/auth/refresh') {
+          this.processQueue(false, error);
+          this.isRefreshing = false;
+          this.clearToken();
+          window.location.href = '/login';
+          return Promise.reject(error);
         }
+
+        // 如果是 401 錯誤且未進行過重試
+        if (error.response?.status === 401 && !originalRequest._retry) {
+          originalRequest._retry = true;
+
+          if (!this.isRefreshing) {
+            this.isRefreshing = true;
+
+            try {
+              const refreshToken = localStorage.getItem('refresh_token');
+              if (!refreshToken) {
+                throw new Error('No refresh token available');
+              }
+
+              const response = await this.refreshToken(refreshToken);
+              this.setToken(response.accessToken, response.refreshToken);
+
+              this.processQueue(true);
+              this.isRefreshing = false;
+
+              originalRequest.headers[
+                'Authorization'
+              ] = `Bearer ${response.accessToken}`;
+              return this.instance(originalRequest);
+            } catch (refreshError) {
+              this.processQueue(false, refreshError);
+              this.isRefreshing = false;
+              this.clearToken();
+              window.location.href = '/login';
+              return Promise.reject(refreshError);
+            }
+          }
+
+          // 如果已經在刷新，將請求加入隊列
+          return new Promise((resolve, reject) => {
+            this.failedQueue.push({ resolve, reject });
+          });
+        }
+
         return Promise.reject(error);
       }
     );
+  }
+
+  private processQueue(shouldProceed = true, error: any = null) {
+    this.failedQueue.forEach((prom) => {
+      if (shouldProceed) {
+        prom.resolve();
+      } else {
+        prom.reject(error);
+      }
+    });
+    this.failedQueue = [];
   }
 
   setToken(accessToken: string, refreshToken: string) {

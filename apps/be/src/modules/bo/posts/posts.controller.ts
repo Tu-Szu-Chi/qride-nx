@@ -32,7 +32,7 @@ export class PostsController {
     return this.postsService.create(createPostDto);
   }
 
-  @Roles(BoRole.AGENT)
+  @Roles(BoRole.ADMIN)
   @Get()
   findAll(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
     return this.postsService.findAll(page, limit);
