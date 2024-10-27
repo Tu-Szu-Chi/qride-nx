@@ -37,7 +37,15 @@ http {
         }
 
         # API 代理配置，對應 vite.config.ts 中的 /api/bo 代理
-        location /api/bo {
+        location /api/bo/ {
+            # 添加除錯日誌
+            error_log stderr debug;
+                # 在代理之前記錄原始請求
+            add_header X-Original-URI $request_uri;
+            add_header X-Forwarded-URI $uri;
+    
+            rewrite ^/api/bo/(.*) /$1 break;
+
             proxy_pass <%= ENV['BO_PUBLIC_API_URL'] %>;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
@@ -46,6 +54,11 @@ http {
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+
+            # CORS 配置
+            add_header Access-Control-Allow-Origin '*' always;
+            add_header Access-Control-Allow-Methods 'GET, POST, PUT, DELETE, OPTIONS' always;
+            add_header Access-Control-Allow-Headers '*' always;
 
             # 允許的 HTTP 方法
             add_header Allow "GET, POST, PUT, DELETE, OPTIONS" always;
@@ -66,7 +79,7 @@ http {
         }
 
         # 對應 vite.config.ts 中的 /uploads 代理
-        location /uploads {
+        location /uploads/ {
             proxy_pass <%= ENV['BO_PUBLIC_API_URL'] %>;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
