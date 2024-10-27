@@ -2,6 +2,7 @@ import { Pool, QueryArrayConfig, QueryConfig, QueryConfigValues, QueryResult, Qu
 import knex from 'knex';
 import { parse } from 'pg-connection-string';
 import { camelCase } from 'lodash';
+import knexSnakeCaseMappers  from 'knex-stringcase';
 
 const toCamelCase = <T extends Record<string, any>>(rows: T[]): T[] => {
   return rows.map(row => {
@@ -75,6 +76,7 @@ export const db = knex({
     min: 2,
     max: 10,
   },
+  ...knexSnakeCaseMappers()
 });
 
 export default pool;
