@@ -3,8 +3,8 @@ import { PostsService } from './posts.service';
 import { PostsController } from './posts.controller';
 import { PostRepository } from './posts.repository';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { TransformInterceptor } from '../../common/interceptors/transform.interceptor';
-import { UploadController } from '../upload/upload.controller';
+import { TransformInterceptor } from '$/common/interceptors/transform.interceptor';
+import { UploadController } from '$/modules/upload/upload.controller';
 
 @Module({
   controllers: [PostsController, UploadController],

@@ -4,13 +4,12 @@ import {
   Injectable,
   Logger,
 } from '@nestjs/common';
-import { Pool } from 'pg';
-import { KNEX_CONNECTION } from '../../database.module';
+import { Pool, QueryResult } from 'pg';
+import { KNEX_CONNECTION } from '$/database.module';
 import { Knex } from 'knex';
 import { isEmpty } from 'lodash';
-import { CreatePostDto } from './dto/create-post.dto';
-import { UpdatePostDto } from './dto/update-post.dto';
-import { Post } from './postEntity';
+import { CreatePostDto, UpdatePostDto } from '$/types';
+import { PostCategoryEnum, PostEntity } from '@org/types';
 
 @Injectable()
 export class PostRepository {
@@ -21,7 +20,7 @@ export class PostRepository {
     @Inject(KNEX_CONNECTION) private readonly knex: Knex
   ) {}
 
-  async findById(id: string): Promise<Post | null> {
+  async findById(id: string): Promise<PostEntity | null> {
     try {
       const [post] = await this.knex('posts').where({ id }).select('*');
       return post || null;
@@ -37,7 +36,7 @@ export class PostRepository {
   async findAll(
     page: number,
     limit: number
-  ): Promise<{ data: Post[]; total: number }> {
+  ): Promise<{ data: PostEntity[]; total: number }> {
     const offset = (page - 1) * limit;
     try {
       const data = await this.knex('posts')
@@ -51,8 +50,25 @@ export class PostRepository {
       throw error;
     }
   }
+  async getActiveList(limit: number = 10, category?: PostCategoryEnum): Promise<PostEntity[]> {
+    const query = `
+      SELECT * FROM posts
+      WHERE is_active = true
+      AND publish_start_date < NOW()
+      AND publish_end_date > NOW()
+      ${category != undefined ? `category = ${category}` : ''}
+      LIMIT ${limit}
+    `
+    try {
+      const result:QueryResult<PostEntity> = await this.pool.query(query)
+      return result.rows;
+    } catch(error) {
+      this.logger.error(`Get active posts failed: ${error.message}`, error.stack);
+      throw error;
+    }
+  }
 
-  async create(createPostDto: CreatePostDto): Promise<Post> {
+  async create(createPostDto: CreatePostDto): Promise<PostEntity> {
     const postToInsert = {
       ...createPostDto,
       created_at: new Date(),
@@ -76,7 +92,7 @@ export class PostRepository {
     }
   }
 
-  async update(id: string, updatePostDto: UpdatePostDto): Promise<Post> {
+  async update(id: string, updatePostDto: UpdatePostDto): Promise<PostEntity> {
     const postToUpdate = {
       ...updatePostDto,
       updated_at: new Date(),

@@ -2,29 +2,29 @@
 
 import React from "react";
 import Header from "$/components/Header";
-import { ArticleTypeEnum } from "@org/types";
+import { PostCategoryEnum } from "@org/types";
 import NewsItem from "$/components/News/item";
 
 const newsItems = [
     {
-      type: ArticleTypeEnum.NEWS,
+      type: PostCategoryEnum.NEWS,
       date: new Date('2024-07-12'),
       title:
         'New Model Release! 2024 Vintage Motorcycle Series Now Available for Pre-Order',
     },
     {
-      type: ArticleTypeEnum.PROMO,
+      type: PostCategoryEnum.PROMO,
       date: new Date('2024/7/1'),
       title: 'Summer Maintenance Specials, Limited Time Discounts Starting Soon',
     },
     {
-      type: ArticleTypeEnum.EVENT,
+      type: PostCategoryEnum.EVENT,
       date: new Date('2024/6/10'),
       title:
         'Exclusive Member Test Ride Event: Experience the Latest Motorcycle Models',
     },
     {
-      type: ArticleTypeEnum.MEDIA,
+      type: PostCategoryEnum.MEDIA,
       date: new Date('2024/6/8'),
       title: 'Latest Maintenance Tips to Keep Your Bike in Top Condition',
     },

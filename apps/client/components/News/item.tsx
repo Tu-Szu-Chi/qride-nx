@@ -1,18 +1,18 @@
 import React from "react";
-import { ArticleTypeEnum } from "@org/types";
+import { PostCategoryEnum } from "@org/types";
 import { fromDate } from '@org/common';
 import { useRouter } from "next/navigation";
 
 
-const getTypeColor = (type: ArticleTypeEnum) => {
+const getTypeColor = (type: PostCategoryEnum) => {
     switch (type) {
-      case ArticleTypeEnum.NEWS:
+      case PostCategoryEnum.NEWS:
         return 'bg-blue-100';
-      case ArticleTypeEnum.PROMO:
+      case PostCategoryEnum.PROMO:
         return 'bg-orange-500';
-      case ArticleTypeEnum.EVENT:
+      case PostCategoryEnum.EVENT:
         return 'bg-red-200';
-      case ArticleTypeEnum.MEDIA:
+      case PostCategoryEnum.MEDIA:
         return 'bg-green-200';
       default:
         return 'bg-gray-500';
@@ -20,7 +20,7 @@ const getTypeColor = (type: ArticleTypeEnum) => {
   };
 
 type Props = {
-   type: ArticleTypeEnum,
+   type: PostCategoryEnum,
    date: Date,
    title: string
 }
