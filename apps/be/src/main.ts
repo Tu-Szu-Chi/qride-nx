@@ -15,14 +15,9 @@ async function bootstrap() {
   const globalPrefix = 'api';
   const port = process.env.PORT || 3000;
 
-  const whitelist = [
-    process.env.ALLOWED_ORIGINS_CLIENT,
-    process.env.ALLOWED_ORIGINS_BO,
-  ];
-
   app.enableCors({
     origin: (origin, callback) => {
-      if (!origin || whitelist.indexOf(origin) !== -1) {
+      if (!origin || process.env.ALLOWED_ORIGINS.split(',').includes(origin)) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
