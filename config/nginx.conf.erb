@@ -31,8 +31,50 @@ http {
         keepalive_timeout 5;
         root /app/dist/apps/bo;
 
+        # 靜態文件
         location / {
             try_files $uri $uri/ /index.html;
+        }
+
+        # API 代理配置，對應 vite.config.ts 中的 /api/bo 代理
+        location /api/bo {
+            proxy_pass <%= ENV['BO_PUBLIC_API_URL'] %>;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            # 允許的 HTTP 方法
+            add_header Allow "GET, POST, PUT, DELETE, OPTIONS" always;
+            
+            # 處理 OPTIONS 請求
+            if ($request_method = 'OPTIONS') {
+                add_header 'Access-Control-Allow-Origin' '*';
+                add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS';
+                add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization';
+                add_header 'Access-Control-Max-Age' 1728000;
+                add_header 'Content-Type' 'text/plain; charset=utf-8';
+                add_header 'Content-Length' 0;
+                return 204;
+            }
+
+            # 記錄代理請求
+            access_log <%= ENV['NGINX_ACCESS_LOG_PATH'] || '/dev/stdout' %> l2met;
+        }
+
+        # 對應 vite.config.ts 中的 /uploads 代理
+        location /uploads {
+            proxy_pass <%= ENV['BO_PUBLIC_API_URL'] %>;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
         }
     }
 }
