@@ -7,7 +7,7 @@ export enum Category {
 export interface Post {
   id: string;
   title: string;
-  category: 'News' | 'Promo' | 'Event';
+  category: Category;
   content: string;
   cover_image?: string;
   is_active: boolean;

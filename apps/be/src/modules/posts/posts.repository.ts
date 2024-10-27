@@ -10,7 +10,7 @@ import { Knex } from 'knex';
 import { isEmpty } from 'lodash';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { Post } from './interfaces/post.interface';
+import { Post } from './postEntity';
 
 @Injectable()
 export class PostRepository {
@@ -47,7 +47,7 @@ export class PostRepository {
       const [{ count }] = await this.knex('posts').count('id as count');
       return { data, total: parseInt(count as string, 10) };
     } catch (error) {
-      console.error('Error fetching posts:', error);
+      this.logger.error(`Error fetching posts: ${error.message}`, error.stack);
       throw error;
     }
   }
@@ -60,18 +60,18 @@ export class PostRepository {
     };
     if (isEmpty(postToInsert)) throw new BadRequestException('Empty payload');
 
-    // this.logger.debug(
-    //   `Attempting to insert post: ${JSON.stringify(postToInsert)}`
-    // );
+    this.logger.debug(
+      `Attempting to insert post: ${JSON.stringify(postToInsert)}`
+    );
 
     try {
       const [post] = await this.knex('posts')
         .insert(postToInsert)
         .returning('*');
-      // this.logger.debug(`Successfully inserted post: ${JSON.stringify(post)}`);
+      this.logger.debug(`Successfully inserted post: ${JSON.stringify(post)}`);
       return post;
     } catch (error) {
-      // this.logger.error(`Error creating post: ${error.message}`, error.stack);
+      this.logger.error(`Error creating post: ${error.message}`, error.stack);
       throw error;
     }
   }

@@ -18,7 +18,7 @@ import 'react-quill/dist/quill.snow.css';
 import '../quill-image-resize.css';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import { uploadImage } from '../services/api';
+import API from '../utils/fetch';
 import { FormValues, Post } from '../types/post';
 import { quillFormats, createQuillModules } from '../config/quillConfig';
 import { UploadChangeParam } from 'antd/lib/upload';
@@ -80,7 +80,7 @@ const PostForm: React.FC<PostFormProps> = ({
     input.onchange = async () => {
       if (input.files) {
         const file = input.files[0];
-        const { imageUrl } = await uploadImage(file);
+        const { imageUrl } = await API.uploadImage(file);
         const quill = quillRef.current?.getEditor();
         if (quill) {
           const range = quill.getSelection(true);
@@ -115,7 +115,7 @@ const PostForm: React.FC<PostFormProps> = ({
 
       if (fileToUpload) {
         try {
-          const response = await uploadImage(fileToUpload);
+          const response = await API.uploadImage(fileToUpload);
           setPreviewImage(response.imageUrl);
           setCoverImageUrl(response.imageUrl);
         } catch (error) {

@@ -5,14 +5,14 @@ import {
   IsDate,
   IsOptional,
 } from 'class-validator';
-import { Category } from '../interfaces/post.interface';
+import { Category } from '../postEntity';
 
 export class CreatePostDto {
   @IsString()
   title: string;
 
   @IsEnum(Category)
-  category: 'News' | 'Promo' | 'Event';
+  category: Category;
 
   @IsString()
   content: string;

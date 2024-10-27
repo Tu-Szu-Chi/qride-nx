@@ -21,3 +21,12 @@ export interface FormValues {
   isActive: boolean;
   publishDateRange: [Moment, Moment];
 }
+
+export interface UploadImageResponse {
+  imageUrl: string;
+}
+
+export interface GetPostsResponse {
+  data: Post[];
+  total: number;
+}

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Button, message } from 'antd';
 import { PlusOutlined, MinusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { validate as uuidValidate } from 'uuid';
-import { getPosts, createPost, updatePost, deletePost } from '../services/api';
+import API from '../utils/fetch';
 import DeleteConfirmModal from '../components/DeleteConfirmModal';
 import PostForm from '../components/PostForm';
 import PostTable from '../components/PostTable';
@@ -26,7 +26,7 @@ const PostManagement: React.FC = () => {
   const fetchPosts = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await getPosts(currentPage, pageSize);
+      const response = await API.getPosts(currentPage, pageSize);
       setPosts(response.data);
       setTotalPosts(response.total);
     } catch (error) {
@@ -47,10 +47,10 @@ const PostManagement: React.FC = () => {
   const handleSubmit = async (values: FormValues) => {
     try {
       if (editingPost) {
-        await updatePost(editingPost.id.toString(), values);
+        await API.updatePost(editingPost.id.toString(), values);
         message.success('Post updated successfully');
       } else {
-        await createPost(values);
+        await API.createPost(values);
         message.success('Post created successfully');
       }
 
@@ -81,7 +81,7 @@ const PostManagement: React.FC = () => {
         return;
       }
 
-      await Promise.all(validIds.map((id) => deletePost(id as string)));
+      await Promise.all(validIds.map((id) => API.deletePost(id as string)));
       message.success('Selected posts deleted successfully');
       setSelectedPosts([]);
       fetchPosts();

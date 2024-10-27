@@ -1,12 +1,12 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreatePostDto } from './create-post.dto';
 import { IsEnum, IsOptional, IsString, IsBoolean } from 'class-validator';
-import { Category } from '../interfaces/post.interface';
+import { Category } from '../postEntity';
 
 export class UpdatePostDto extends PartialType(CreatePostDto) {
   @IsEnum(Category)
   @IsOptional()
-  category?: 'News' | 'Promo' | 'Event';
+  category?: Category;
 
   @IsString()
   @IsOptional()

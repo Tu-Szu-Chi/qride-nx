@@ -15,7 +15,10 @@ async function bootstrap() {
   const globalPrefix = 'api';
   const port = process.env.PORT || 3000;
 
-  const whitelist = ['http://localhost:4200', 'http://localhost:5173'];
+  const whitelist = [
+    process.env.ALLOWED_ORIGINS_CLIENT,
+    process.env.ALLOWED_ORIGINS_BO,
+  ];
 
   app.enableCors({
     origin: (origin, callback) => {
