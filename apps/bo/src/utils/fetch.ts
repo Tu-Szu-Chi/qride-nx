@@ -5,9 +5,9 @@ import {
   BoAuthResponse,
   BoUser,
   CreateBoUserDto,
+  PostEntity
 } from '@org/types';
-import { Post, UploadImageResponse, GetPostsResponse } from '../types/index';
-
+import  { GetPostsResponse, UploadImageResponse } from '$/types'
 class Api {
   private instance: AxiosInstance;
   private isRefreshing = false;
@@ -51,6 +51,22 @@ class Api {
           this.clearToken();
           window.location.href = '/login';
           return Promise.reject(error);
+        }
+        else if (error.response.status === 401 && !originalRequest._retry) {
+          originalRequest._retry = true;
+          try {
+            const refreshToken = localStorage.getItem('refresh_token');
+            const response = await this.refreshToken(refreshToken);
+            this.setToken(response.accessToken, response.refreshToken);
+            originalRequest.headers[
+              'Authorization'
+            ] = `Bearer ${response.accessToken}`;
+            return this.instance(originalRequest);
+          } catch (refreshError) {
+            this.clearToken();
+            window.location.href = '/login';
+            return Promise.reject(refreshError);
+          }
         }
 
         // 如果是 401 錯誤且未進行過重試
@@ -189,11 +205,11 @@ class Api {
     return this.get(`/posts?page=${page}&limit=${limit}`);
   }
 
-  async createPost(postData: Partial<Post>) {
+  async createPost(postData: Partial<PostEntity>) {
     return this.post('/posts', postData);
   }
 
-  async updatePost(id: string, postData: Partial<Post>) {
+  async updatePost(id: string, postData: Partial<PostEntity>) {
     return this.patch(`/posts/${id}`, postData);
   }
 
@@ -204,7 +220,7 @@ class Api {
   async uploadImage(file: File | Blob): Promise<UploadImageResponse> {
     const formData = new FormData();
     formData.append('image', file);
-    return this.post('/upload/image', formData, {
+    return this.post('/posts/upload/image', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

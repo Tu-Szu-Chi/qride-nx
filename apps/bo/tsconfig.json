@@ -2,7 +2,12 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "esModuleInterop": true,
-    "types": ["vite/client"]
+    "types": ["vite/client"],
+    "paths": {
+      "@org/common": ["common/src/index.ts"],
+      "@org/types": ["types/src/index.ts"],
+      "$/*": ["./apps/bo/src/*"],
+    },
     // "types": ["vite/client", "vitest"],
   },
   "files": [],

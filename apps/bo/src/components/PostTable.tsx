@@ -2,18 +2,18 @@ import React from 'react';
 import { Table, Button, Tag } from 'antd';
 import { EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import { Post } from '../types/post';
 import { TableRowSelection } from 'antd/es/table/interface';
+import { PostEntity } from '@org/types'
 
 interface PostTableProps {
-  posts: Post[];
+  posts: PostEntity[];
   loading: boolean;
   totalPosts: number;
   currentPage: number;
   pageSize: number;
   onPageChange: (page: number, pageSize: number) => void;
-  onEdit: (post: Post) => void;
-  rowSelection: TableRowSelection<Post>;
+  onEdit: (post: PostEntity) => void;
+  rowSelection: TableRowSelection<PostEntity>;
 }
 
 const getCategoryColor = (category: string) => {
@@ -63,7 +63,7 @@ const PostTable: React.FC<PostTableProps> = ({
     {
       title: 'Publish Date Range',
       key: 'publishDateRange',
-      render: (_: unknown, record: Post) =>
+      render: (_: unknown, record: PostEntity) =>
         `${dayjs(record.publishStartDate).format('YYYY-MM-DD')} - ${dayjs(
           record.publishEndDate
         ).format('YYYY-MM-DD')}`,
@@ -71,7 +71,7 @@ const PostTable: React.FC<PostTableProps> = ({
     {
       title: 'Actions',
       key: 'actions',
-      render: (_: unknown, record: Post) => (
+      render: (_: unknown, record: PostEntity) => (
         <Button icon={<EditOutlined />} onClick={() => onEdit(record)}>
           Edit
         </Button>

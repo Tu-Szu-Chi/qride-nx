@@ -19,7 +19,8 @@ import '../quill-image-resize.css';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import API from '../utils/fetch';
-import { FormValues, Post } from '../types/post';
+import { FormValues } from '../types/post';
+import { PostEntity } from '@org/types'
 import { quillFormats, createQuillModules } from '../config/quillConfig';
 import { UploadChangeParam } from 'antd/lib/upload';
 import { UploadFile } from 'antd/es/upload/interface';
@@ -32,7 +33,7 @@ const { RangePicker } = DatePicker;
 interface PostFormProps {
   onSubmit: (values: FormValues) => void;
   onCancel: () => void;
-  initialValues?: Post;
+  initialValues?: PostEntity;
 }
 
 const PostForm: React.FC<PostFormProps> = ({

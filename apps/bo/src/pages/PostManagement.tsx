@@ -6,13 +6,14 @@ import API from '../utils/fetch';
 import DeleteConfirmModal from '../components/DeleteConfirmModal';
 import PostForm from '../components/PostForm';
 import PostTable from '../components/PostTable';
-import { Post, FormValues } from '../types/post';
+import { FormValues } from '../types/post';
+import { PostEntity } from '@org/types'
 
 const PostManagement: React.FC = () => {
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<PostEntity[]>([]);
   const [selectedPosts, setSelectedPosts] = useState<React.Key[]>([]);
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const [editingPost, setEditingPost] = useState<Post | null>(null);
+  const [editingPost, setEditingPost] = useState<PostEntity | null>(null);
   const [loading, setLoading] = useState(false);
   const [totalPosts, setTotalPosts] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -39,7 +40,7 @@ const PostManagement: React.FC = () => {
     }
   }, [currentPage, pageSize]);
 
-  const handleEdit = useCallback((post: Post) => {
+  const handleEdit = useCallback((post: PostEntity) => {
     setEditingPost(post);
     setIsFormVisible(true);
   }, []);
