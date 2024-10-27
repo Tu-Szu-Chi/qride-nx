@@ -4,10 +4,10 @@ export type DealerEntity = {
     name: string;
     owner_name: string;
     phone: string;
-    biz_type: DealerBizType; // Enum
-    address_state: string;
-    address_city: string;
-    address_detail?: string;
+    bizType: DealerBizType; // Enum
+    addressState: string;
+    addressCity: string;
+    addressDetail?: string;
     email?: string;
     whatsapp?: string;
     facebook?: string;

@@ -5,8 +5,9 @@ import { AuthModule } from './modules/auth/auth.module';
 import { DatabaseModule } from './database.module';
 import { ProductModule } from './modules/product/product.module';
 import { BoModule } from './modules/bo/bo.module';
-import { PostsModule } from './modules/bo/posts/posts.module';
+import { PostsBoModule } from './modules/bo/posts/posts.module';
 import { RouterModule } from '@nestjs/core';
+import { PostsModule } from './modules/posts/posts.module';
 
 @Module({
   imports: [
@@ -18,11 +19,12 @@ import { RouterModule } from '@nestjs/core';
     AuthModule,
     ProductModule,
     BoModule,
+    PostsBoModule,
     PostsModule,
     RouterModule.register([
       {
         path: 'bo',
-        module: PostsModule,
+        module: PostsBoModule,
       },
     ]),
   ],

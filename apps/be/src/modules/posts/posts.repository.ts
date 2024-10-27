@@ -8,7 +8,7 @@ import { Pool, QueryResult } from 'pg';
 import { KNEX_CONNECTION } from '$/database.module';
 import { Knex } from 'knex';
 import { isEmpty } from 'lodash';
-import { CreatePostDto, UpdatePostDto } from '$/types';
+import { CreatePostDto, UpdatePostDto } from '$/modules/bo/posts/posts.dto';
 import { PostCategoryEnum, PostEntity } from '@org/types';
 
 @Injectable()

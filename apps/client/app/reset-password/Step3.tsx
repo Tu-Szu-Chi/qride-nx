@@ -39,7 +39,7 @@ const Step3 = () => {
         onSubmit={(values, { setSubmitting, setFieldError }) => {
           const payload: ResetPasswordDto = {
             password: values.password,
-            re_password: values.rePassword,
+            rePassword: values.rePassword,
           };
           setSubmitting(true);
           API

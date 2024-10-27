@@ -4,13 +4,13 @@ export interface RegisterDto {
   phone: string;
   type: UserType;
   password: string;
-  re_password: string;
-  first_name: string;
-  mid_name?: string;
-  last_name: string;
-  address_state: string;
-  address_city: string;
-  address_detail?: string;
+  rePassword: string;
+  firstName: string;
+  midName?: string;
+  lastName: string;
+  addressState: string;
+  addressCity: string;
+  addressDetail?: string;
   birthday?: string;
   source?: UserSourceType;
   email?: string;
@@ -36,7 +36,7 @@ export interface VerifyOtpDto {
 }
 export interface ResetPasswordDto {
   password: string;
-  re_password: string;
+  rePassword: string;
 }
 export enum OtpTypeEnum {
   REGISTER = 'register',
@@ -48,7 +48,7 @@ export type OtpEntity = {
   type: OtpTypeEnum;
   code: string;
   phone: string;
-  is_verified: boolean;
+  isVerified: boolean;
   created_at: Date;
   updated_at: Date;
 }

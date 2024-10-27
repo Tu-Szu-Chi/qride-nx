@@ -10,7 +10,6 @@ import { useRouter } from 'next/navigation';
 import { usePopup } from '$/hooks/PopupProvider';
 import { DEFAULT_ERROR_MSG } from '@org/common';
 import DropdownField from '$/components/Dropdown';
-import { DayPicker } from 'react-day-picker';
 const CreateSchema = Yup.object().shape({
   id: Yup.string().required('Required'),
   model: Yup.string().required('Required'),
@@ -105,10 +104,10 @@ export default function GarageAdd() {
           API.post('/product/save', {
             id: values.id,
             vin: values.vin,
-            engine_number: values.engineNumber,
-            purchase_date: values.purchaseDate,
-            registration_date: values.registrationDate,
-            dealer_name: values.dealerName,
+            engineNumber: values.engineNumber,
+            purchaseDate: values.purchaseDate,
+            registrationDate: values.registrationDate,
+            dealerName: values.dealerName,
             year: values.year,
             model: values.model,
           } as ProductDto)

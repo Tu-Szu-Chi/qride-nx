@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { RegisterDto, User, UserEntity, UserUpdateDto, UserVO } from '@org/types';
+import { RegisterDto, UserEntity, UserUpdateDto, UserVO } from '@org/types';
 import { UserRepository } from './user.repository';
 import { omit } from 'lodash';
 
@@ -16,7 +16,7 @@ export class UserService {
   async getUserInfo(userId: string): Promise<UserVO | undefined> {
     const user = await this.userRepository.findById(userId)
     return {
-      ...omit(user, ['is_delete', 'created_at', 'updated_at', 'password', 'birthday']),
+      ...omit(user, ['isDelete', 'createdAt', 'updatedAt', 'password']),
     }
   }
 
@@ -26,16 +26,15 @@ export class UserService {
 
   async create(createUserDto: RegisterDto, hashedPassword: string): Promise<UserVO> {
     const userEntity = await this.userRepository.create({
-     ...omit(createUserDto, ['password', 're_password']),
+     ...omit(createUserDto, ['password', 'rePassword']),
       password: hashedPassword,
     });
     return {
       ...omit(userEntity, [
-        'created_at',
-        'updated_at',
-        'is_delete',
+        'createdAt',
+        'updatedAt',
+        'isDelete',
         'password',
-        'birthday'
       ]),
     };
   }
@@ -57,9 +56,9 @@ async updatePassword(userId: string, password: string): Promise<UserVO> {
   const userEntity = await this.userRepository.update(userId, { password });
   return {
     ...omit(userEntity, [
-      'created_at',
-      'updated_at',
-      'is_delete',
+      'createdAt',
+      'updatedAt',
+      'isDelete',
       'password',
       'birthday'
     ]),
@@ -72,11 +71,10 @@ async updatePassword(userId: string, password: string): Promise<UserVO> {
     const userEntity = await this.userRepository.update(userId, updateData);
     return {
       ...omit(userEntity, [
-        'created_at',
-        'updated_at',
-        'is_delete',
+        'createdAt',
+        'updatedAt',
+        'isDelete',
         'password',
-        'birthday'
       ]),
     };
   }

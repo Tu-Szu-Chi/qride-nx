@@ -30,15 +30,15 @@ const ATTRS: Columns = {
   type: {
     title: 'Type',
   },
-  first_name: {
+  firstName: {
     title: 'First name',
     editable: true,
   },
-  mid_name: {
+  midName: {
     title: 'Mid name',
     editable: true,
   },
-  last_name: {
+  lastName: {
     title: 'Last name',
     editable: true,
   },
@@ -46,15 +46,15 @@ const ATTRS: Columns = {
     title: 'Email',
     editable: true,
   },
-  address_city: {
+  addressCity: {
     title: 'City',
     editable: true,
   },
-  address_state: {
+  addressState: {
     title: 'State',
     editable: true,
   },
-  address_detail: {
+  addressDetail: {
     title: 'Address',
     editable: true,
   },

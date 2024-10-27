@@ -9,12 +9,10 @@ import { IconButton } from '@radix-ui/themes';
 import { CheckIcon, Cross2Icon } from '@radix-ui/react-icons';
 import {
   ModelVO,
-  ProductDto,
   ProductRemoveDto,
   ProductUpdateDto,
   ProductVO,
 } from '@org/types';
-import { useRouter } from 'next/navigation';
 import { usePopup } from '$/hooks/PopupProvider';
 import { DEFAULT_ERROR_MSG } from '@org/common';
 import DropdownField from '$/components/Dropdown';
@@ -50,7 +48,6 @@ type Columns = {
     title: string;
     type?: string;
     editable?: boolean;
-    key?: keyof ProductUpdateDto['data'];
   };
 };
 
@@ -74,24 +71,20 @@ const ATTRS: Columns = {
   engineNumber: {
     title: 'Engine Serial No.',
     editable: true,
-    key: 'engine_number',
   },
   purchaseDate: {
     title: 'Purchase Date',
     type: 'date',
     editable: true,
-    key: 'purchase_date',
   },
   registrationDate: {
     title: 'Registration Date',
     type: 'date',
     editable: true,
-    key: 'registration_date',
   },
   dealerName: {
     title: 'Dealer Name',
     editable: true,
-    key: 'dealer_name',
   },
 };
 type Props = {
@@ -115,10 +108,10 @@ export default function GarageEdit({ data, onCancel, onRemove }: Props) {
     model: data.model,
     year: data.year,
     vin: data.vin,
-    engineNumber: data.engine_number,
-    purchaseDate: data.purchase_date,
-    registrationDate: data.registration_date,
-    dealerName: data.dealer_name,
+    engineNumber: data.engineNumber,
+    purchaseDate: data.purchaseDate,
+    registrationDate: data.registrationDate,
+    dealerName: data.dealerName,
   });
   const { showPopup, hidePopup } = usePopup();
   useEffect(() => {
@@ -172,13 +165,8 @@ export default function GarageEdit({ data, onCancel, onRemove }: Props) {
         onSubmit={(values, { setSubmitting, setFieldValue }) => {
           if (!editKey) return;
           const data: ProductUpdateDto['data'] = {};
-          if (ATTRS[editKey].key) {
-            // @ts-expect-error F*CK
-            data[ATTRS[editKey].key] = editValue;
-          } else {
-            // @ts-expect-error F*CK
-            data[editKey] = editValue;
-          }
+          // @ts-expect-error F*CK
+          data[editKey] = editValue;
           API.put('/product/save', {
             id: values.id,
             data,

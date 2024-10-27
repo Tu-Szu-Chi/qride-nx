@@ -1,11 +1,11 @@
 export type ProductEntity = {
     id: string;  // Vehicle Registration ID
-    user_id: string;
+    userId: string;
     vin: string;
-    engine_number: string;
-    purchase_date: string;
-    registration_date: string;
-    dealer_name: string;
+    engineNumber: string;
+    purchaseDate: string;
+    registrationDate: string;
+    dealerName: string;
     year: number;
     model: string; // mapping to DB
 }
@@ -18,7 +18,7 @@ export type ProductDto = Omit<ProductEntity, 'user_id' >
 
 export type ProductUpdateDto =  {
     id: string,
-    data: Partial<Pick<ProductEntity, 'year' | 'vin' | 'engine_number' | 'purchase_date' | 'registration_date' | 'dealer_name'>>
+    data: Partial<Pick<ProductEntity, 'year' | 'vin' | 'engineNumber' | 'purchaseDate' | 'registrationDate' | 'dealerName'>>
 }
 
 export type ProductRemoveDto = {

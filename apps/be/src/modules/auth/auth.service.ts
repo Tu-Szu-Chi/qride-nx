@@ -96,7 +96,7 @@ export class AuthService {
     )
       throw new UnauthorizedException();
 
-    const { password, re_password } = payload;
+    const { password, rePassword: re_password } = payload;
     if (password != re_password || !passwordRegex.test(password)) {
       return { bizCode: INVALID_PAYLOAD, data: { error: { type: 'password', message: 'Invalid Password'} }}
     }
@@ -143,13 +143,13 @@ export class AuthService {
       phone,
       type,
       password,
-      re_password,
-      first_name,
-      mid_name = '',
-      last_name,
-      address_city,
-      address_state,
-      address_detail = '',
+      rePassword: re_password,
+      firstName: first_name,
+      midName: mid_name = '',
+      lastName: last_name,
+      addressCity: address_city,
+      addressState: address_state,
+      addressDetail: address_detail = '',
       birthday = '',
       source = NaN,
       email = '',

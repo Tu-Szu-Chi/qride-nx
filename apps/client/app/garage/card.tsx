@@ -16,12 +16,12 @@ const rowCss = css`
 const ProductCard = ({ data, handleEdit }: { data: ProductVO, handleEdit: (data: ProductVO) => void }) => {
   const {
     model,
-    registration_date,
+    registrationDate,
     id,
     vin,
-    engine_number,
-    purchase_date,
-    dealer_name,
+    engineNumber,
+    purchaseDate,
+    dealerName,
   } = data;
 
   return (
@@ -55,19 +55,19 @@ const ProductCard = ({ data, handleEdit }: { data: ProductVO, handleEdit: (data:
         </div>
         <div>
           <p >Engine Serial Number</p>
-          <p className="font-semibold">{engine_number}</p>
+          <p className="font-semibold">{engineNumber}</p>
         </div>
         <div>
           <p >Purchase Date</p>
-          <p className="font-semibold">{purchase_date}</p>
+          <p className="font-semibold">{purchaseDate}</p>
         </div>
         <div>
           <p >Registration Date</p>
-          <p className="font-semibold">{registration_date}</p>
+          <p className="font-semibold">{registrationDate}</p>
         </div>
         <div>
           <p >Dealer Name</p>
-          <p className="font-semibold">{dealer_name}</p>
+          <p className="font-semibold">{dealerName}</p>
         </div>
       </div>
     </div>

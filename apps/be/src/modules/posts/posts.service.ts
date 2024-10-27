@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PostEntity } from '@org/types';
-import {  CreatePostDto, UpdatePostDto } from '$/types'
+import {  CreatePostDto, UpdatePostDto } from '$/modules/bo/posts/posts.dto'
 import { PostRepository } from './posts.repository';
 
 @Injectable()

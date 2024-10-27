@@ -4,43 +4,43 @@ export interface UserEntity {
   type: UserType;
   email?: string;
   password: string;
-  first_name: string;
-  mid_name?: string; 
-  last_name: string;
-  address_state: string;
-  address_city: string;
-  address_detail?: string; 
+  firstName: string;
+  midName?: string; 
+  lastName: string;
+  addressState: string;
+  addressCity: string;
+  addressDetail?: string; 
   birthday?: string; 
   source?: number; 
   whatsapp?: string; 
   facebook?: string; 
-  created_at: Date;
-  updated_at: Date;
-  is_delete: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  isDelete: boolean;
 }
 
-export type User = Omit<UserEntity, 'created_at' | 'updated_at' | 'is_delete'>;
+export type User = Omit<UserEntity, 'createdAt' | 'updatedAt' | 'isDelete'>;
 
 export type UserVO = Omit<User, 'password' | 'birthday'> & {
   birthday?: string;
 }
-export type UserDto = Omit<User, 'id' | 'created_at' | 'updated_at' | 'is_delete' | 'birthday'> & {
+export type UserDto = Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'isDelete' | 'birthday'> & {
   birthday?: string;
 }
 export interface UserUpdateDto {
   email?: string;
-  address_detail?: string
+  addressDetail?: string
   birthday?: string;
   password?: string;
   whatsapp?: string;
   facebook?: string;
   type?: UserType;
-  first_name?: string;
-  mid_name?: string; 
-  last_name?: string;
-  address_state?: string;
-  address_city?: string;
-  is_delete?: boolean;
+  firstName?: string;
+  midName?: string; 
+  lastName?: string;
+  addressState?: string;
+  addressCity?: string;
+  isDelete?: boolean;
 }
 
 export enum UserType {

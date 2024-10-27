@@ -9,8 +9,8 @@ import {
   Query,
   Logger,
 } from '@nestjs/common';
-import { PostsService } from './posts.service';
-import { CreatePostDto, UpdatePostDto } from '$/types';
+import { PostsService } from '$/modules/posts/posts.service';
+import { CreatePostDto, UpdatePostDto } from './posts.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -29,10 +29,6 @@ export class PostsController {
   @Get()
   findAll(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
     return this.postsService.findAll(page, limit);
-  }
-  @Get('/active')
-  getActiveList() {
-    return this.postsService.getActivePosts();
   }
 
   @Get(':id')

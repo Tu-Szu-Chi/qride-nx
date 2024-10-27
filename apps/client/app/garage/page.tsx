@@ -16,13 +16,13 @@ export default function Garage() {
   const [products, setProducts] = useState<ProductVO[]>([]);
   const [currentProduct, setCurrentProduct] = useState<ProductVO>({
     id: '',
-    user_id: '',
+    userId: '',
     vin: '',
-    engine_number: '',
+    engineNumber: '',
     year: NaN,
-    purchase_date: '',
-    registration_date: '',
-    dealer_name: '',
+    purchaseDate: '',
+    registrationDate: '',
+    dealerName: '',
     model: '',
   });
   const handleFetch = useCallback(() => {

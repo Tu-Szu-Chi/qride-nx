@@ -20,16 +20,16 @@ import { PostCategoryEnum, ICreatePost } from '@org/types'
   
     @IsString()
     @IsOptional()
-    cover_image?: string;
+    coverImage?: string;
   
     @IsBoolean()
-    is_active: boolean;
+    isActive: boolean;
   
     @IsDate()
-    publish_start_date: Date;
+    publishStartDate: Date;
   
     @IsDate()
-    publish_end_date: Date;
+    publishEndDate: Date;
   }
   
   export class UpdatePostDto extends PartialType(CreatePostDto) {
