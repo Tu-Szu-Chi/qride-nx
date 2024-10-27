@@ -49,3 +49,4 @@ node_modules/
 **.sample
 .env
 #amplify-do-not-edit-end
+uploads/

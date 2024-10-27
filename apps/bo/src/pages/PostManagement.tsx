@@ -1,260 +1,110 @@
-import React, {
-  useState,
-  useEffect,
-  useMemo,
-  useCallback,
-  useRef,
-} from 'react';
-
-import {
-  Button,
-  Table,
-  Select,
-  Upload,
-  DatePicker,
-  Switch,
-  message,
-  Form,
-  Input,
-  Row,
-  Col,
-  Card,
-} from 'antd';
-import {
-  PlusOutlined,
-  DeleteOutlined,
-  MinusOutlined,
-  EditOutlined,
-} from '@ant-design/icons';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
-import type { UploadFile, RcFile } from 'antd/es/upload/interface';
-import { UploadChangeParam } from 'antd/lib/upload';
-import ImageResize from 'quill-image-resize-module-react';
-import moment from 'moment';
-
-ReactQuill.Quill.register('modules/imageResize', ImageResize);
-
-const { Option } = Select;
-const { RangePicker } = DatePicker;
-
-interface Post {
-  id: string;
-  title: string;
-  category: string;
-  content: string;
-  coverImage: string;
-  isActive: boolean;
-  publishStartDate: string;
-  publishEndDate: string;
-}
+import React, { useState, useEffect, useCallback } from 'react';
+import { Button, message } from 'antd';
+import { PlusOutlined, MinusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { validate as uuidValidate } from 'uuid';
+import API from '../utils/fetch';
+import DeleteConfirmModal from '../components/DeleteConfirmModal';
+import PostForm from '../components/PostForm';
+import PostTable from '../components/PostTable';
+import { Post, FormValues } from '../types/post';
 
 const PostManagement: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [selectedPosts, setSelectedPosts] = useState<React.Key[]>([]);
-  const [form] = Form.useForm();
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
-  // const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const [content, setContent] = useState('');
-  const quillRef = useRef<ReactQuill>(null);
   const [editingPost, setEditingPost] = useState<Post | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [totalPosts, setTotalPosts] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
 
   useEffect(() => {
     fetchPosts();
-  }, []);
+  }, [currentPage, pageSize]);
 
-  useEffect(() => {
-    return () => {
-      if (previewImage) {
-        URL.revokeObjectURL(previewImage);
-      }
-    };
-  }, [previewImage]);
-
-  const fetchPosts = async () => {
-    // Implement fetching posts from API
-    // For now, we'll use dummy data
-    setPosts([
-      {
-        id: '1',
-        title: 'Sample Post',
-        category: 'News',
-        content: 'This is a sample post content.',
-        coverImage: '',
-        isActive: true,
-        publishStartDate: '2023-05-01',
-        publishEndDate: '2023-05-02',
-      },
-    ]);
-  };
-
-  const handleImageUpload = useCallback(() => {
-    const input = document.createElement('input');
-    input.setAttribute('type', 'file');
-    input.setAttribute('accept', 'image/*');
-    input.click();
-
-    input.onchange = async () => {
-      if (input.files) {
-        const file = input.files[0];
-
-        // const imageUrl = await uploadImage(file);
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const quill = quillRef.current?.getEditor();
-          if (quill) {
-            const range = quill.getSelection(true);
-            quill.insertEmbed(range.index, 'image', e.target?.result as string); // imageUrl
-          }
-        };
-        reader.readAsDataURL(file);
-      }
-    };
-  }, []);
-
-  const handleCoverImageUpload = async (
-    info: UploadChangeParam<UploadFile<any>>
-  ) => {
-    const { file } = info;
-    if (file.originFileObj) {
-      try {
-        const imageUrl = URL.createObjectURL(file.originFileObj);
-        setPreviewImage(imageUrl);
-        setCoverImageUrl(imageUrl);
-      } catch (error) {
-        message.error('Upload failed');
-      }
-    } else {
-      message.error(`Can't handle ${file.name}.`);
+  const fetchPosts = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await API.getPosts(currentPage, pageSize);
+      setPosts(response.data);
+      setTotalPosts(response.total);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      message.error(
+        'Failed to fetch posts: ' + (error.message || 'Unknown error')
+      );
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [currentPage, pageSize]);
 
-  const handleEdit = (post: Post) => {
+  const handleEdit = useCallback((post: Post) => {
     setEditingPost(post);
     setIsFormVisible(true);
-    form.setFieldsValue({
-      title: post.title,
-      category: post.category,
-      isActive: post.isActive,
-      publishDateRange: [
-        moment(post.publishStartDate),
-        moment(post.publishEndDate),
-      ],
-    });
-    setContent(post.content);
-    setCoverImageUrl(post.coverImage);
-    setPreviewImage(post.coverImage);
-  };
+  }, []);
 
-  const handleSubmit = (values: any) => {
+  const handleSubmit = async (values: FormValues) => {
     try {
-      const [publishStartDate, publishEndDate] = values.publishDateRange;
-      const postData = {
-        ...values,
-        content,
-        coverImageUrl: coverImageUrl,
-        publishStartDate: publishStartDate.toISOString(),
-        publishEndDate: publishEndDate.toISOString(),
-        id: editingPost ? editingPost.id : undefined,
-      };
-      console.log('🚀 ~ handleSubmit ~ postData:', postData);
+      if (editingPost) {
+        await API.updatePost(editingPost.id.toString(), values);
+        message.success('Post updated successfully');
+      } else {
+        await API.createPost(values);
+        message.success('Post created successfully');
+      }
 
-      // if (editingPost) {
-      //   await updatePost(postData);
-      // } else {
-      //   await createPost(postData);
-      // }
-
-      message.success(
-        `Post ${editingPost ? 'updated' : 'submitted'} successfully`
-      );
-      resetForm();
+      setIsFormVisible(false);
+      setEditingPost(null);
       fetchPosts();
     } catch (error) {
-      message.error(`Failed to ${editingPost ? 'update' : 'submit'} post`);
+      console.error('Error submitting post:', error);
+      message.error(
+        `Failed to ${editingPost ? 'update' : 'create'} post: ` +
+          (error.message || 'Unknown error')
+      );
     }
-  };
-
-  const resetForm = () => {
-    form.resetFields();
-    setPreviewImage(null);
-    setCoverImageUrl(null);
-    // setFileList([]);
-    setContent('');
-    setEditingPost(null);
   };
 
   const handleDelete = async () => {
-    // Implement delete logic here
-    console.log('Deleting posts:', selectedPosts);
-    message.success('Selected posts deleted successfully');
-    setSelectedPosts([]);
-    fetchPosts();
+    setIsDeleteModalVisible(true);
   };
 
-  const columns = [
-    { title: 'Title', dataIndex: 'title', key: 'title' },
-    { title: 'Category', dataIndex: 'category', key: 'category' },
-    {
-      title: 'Status',
-      dataIndex: 'isActive',
-      key: 'isActive',
-      render: (isActive: boolean) => (isActive ? 'Active' : 'Inactive'),
-    },
-    {
-      title: 'Publish Date Range',
-      key: 'publishDateRange',
-      render: (_:unknown, record: Post) =>
-        `${record.publishStartDate} - ${record.publishEndDate}`,
-    },
-    {
-      title: 'Actions',
-      key: 'actions',
-      render: (_: unknown, record: Post) => (
-        <Button icon={<EditOutlined />} onClick={() => handleEdit(record)}>
-          Edit
-        </Button>
-      ),
-    },
-  ];
+  const confirmDelete = async () => {
+    try {
+      const validIds = selectedPosts.filter(
+        (id) => typeof id === 'string' && uuidValidate(id)
+      );
 
-  const quillModules = useMemo(
-    () => ({
-      toolbar: {
-        container: [
-          [{ header: [1, 2, 3, 4, 5, 6, false] }],
-          ['bold', 'italic', 'underline', 'strike'],
-          [{ list: 'ordered' }, { list: 'bullet' }],
-          [{ indent: '-1' }, { indent: '+1' }],
-          ['link', 'image'],
-          ['clean'],
-        ],
-        handlers: {
-          image: handleImageUpload,
-        },
-      },
-      imageResize: {
-        parchment: ReactQuill.Quill.import('parchment'),
-        modules: ['Resize', 'DisplaySize', 'Toolbar'],
-      },
-    }),
-    [handleImageUpload]
-  );
+      if (validIds.length === 0) {
+        message.error('No valid posts selected for deletion');
+        return;
+      }
 
-  const quillFormats = [
-    'header',
-    'bold',
-    'italic',
-    'underline',
-    'strike',
-    'list',
-    'bullet',
-    'indent',
-    'link',
-    'image',
-  ];
+      await Promise.all(validIds.map((id) => API.deletePost(id as string)));
+      message.success('Selected posts deleted successfully');
+      setSelectedPosts([]);
+      fetchPosts();
+    } catch (error) {
+      console.error('Error deleting posts:', error);
+      message.error(
+        'Failed to delete posts: ' +
+          ((error as Error).message || 'Unknown error')
+      );
+    } finally {
+      setIsDeleteModalVisible(false);
+    }
+  };
+
+  const cancelDelete = () => {
+    setIsDeleteModalVisible(false);
+  };
+
+  const rowSelection = {
+    selectedRowKeys: selectedPosts,
+    onChange: (selectedRowKeys: React.Key[]) =>
+      setSelectedPosts(selectedRowKeys),
+  };
 
   return (
     <div style={{ padding: '24px' }}>
@@ -266,7 +116,7 @@ const PostManagement: React.FC = () => {
         onClick={() => {
           setIsFormVisible(!isFormVisible);
           if (!isFormVisible) {
-            resetForm();
+            setEditingPost(null);
           }
         }}
         style={{ marginBottom: '16px' }}
@@ -275,98 +125,14 @@ const PostManagement: React.FC = () => {
       </Button>
 
       {isFormVisible && (
-        <Card style={{ marginBottom: '16px' }}>
-          <Form form={form} onFinish={handleSubmit} layout="vertical">
-            <Row gutter={16}>
-              <Col span={12}>
-                <Form.Item
-                  name="title"
-                  label="Title"
-                  rules={[{ required: true }]}
-                >
-                  <Input />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item
-                  name="category"
-                  label="Category"
-                  rules={[{ required: true }]}
-                >
-                  <Select placeholder="Select Category">
-                    <Option value="News">News</Option>
-                    <Option value="Promo">Promo</Option>
-                    <Option value="Event">Event</Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-            </Row>
-
-            <Form.Item name="coverImage" label="Cover Image">
-              <Upload
-                name="file"
-                listType="picture-card"
-                className="avatar-uploader"
-                showUploadList={false}
-                beforeUpload={() => false} // Prevent default upload behavior
-                onChange={handleCoverImageUpload}
-              >
-                {previewImage ? (
-                  <img
-                    src={previewImage}
-                    alt="cover"
-                    style={{ width: '100%' }}
-                  />
-                ) : (
-                  <div>
-                    <PlusOutlined />
-                    <div style={{ marginTop: 8 }}>Upload</div>
-                  </div>
-                )}
-              </Upload>
-            </Form.Item>
-
-            <Form.Item label="Content" rules={[{ required: true }]}>
-              <ReactQuill
-                ref={quillRef}
-                value={content}
-                onChange={setContent}
-                modules={quillModules}
-                formats={quillFormats}
-                theme="snow"
-                style={{ height: '300px', marginBottom: '50px' }}
-              />
-            </Form.Item>
-
-            <Row gutter={16}>
-              <Col span={12}>
-                <Form.Item
-                  name="isActive"
-                  label="Status"
-                  valuePropName="checked"
-                >
-                  <Switch />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item name="publishDateRange" label="Publish Date Range">
-                  <RangePicker />
-                </Form.Item>
-              </Col>
-            </Row>
-
-            <Form.Item>
-              <Button type="primary" htmlType="submit">
-                {editingPost ? 'Update' : 'Submit'}
-              </Button>
-              {editingPost && (
-                <Button style={{ marginLeft: '8px' }} onClick={resetForm}>
-                  Cancel
-                </Button>
-              )}
-            </Form.Item>
-          </Form>
-        </Card>
+        <PostForm
+          onSubmit={handleSubmit}
+          onCancel={() => {
+            setIsFormVisible(false);
+            setEditingPost(null);
+          }}
+          initialValues={editingPost || undefined}
+        />
       )}
 
       <div style={{ marginBottom: '16px', marginTop: '32px' }}>
@@ -381,13 +147,25 @@ const PostManagement: React.FC = () => {
         </Button>
       </div>
 
-      <Table
-        rowSelection={{
-          type: 'checkbox',
-          onChange: (selectedRowKeys) => setSelectedPosts(selectedRowKeys),
+      <PostTable
+        posts={posts}
+        loading={loading}
+        totalPosts={totalPosts}
+        currentPage={currentPage}
+        pageSize={pageSize}
+        onPageChange={(page, pageSize) => {
+          setCurrentPage(page);
+          setPageSize(pageSize);
         }}
-        columns={columns}
-        dataSource={posts}
+        onEdit={handleEdit}
+        rowSelection={rowSelection}
+      />
+
+      <DeleteConfirmModal
+        visible={isDeleteModalVisible}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+        selectedCount={selectedPosts.length}
       />
     </div>
   );

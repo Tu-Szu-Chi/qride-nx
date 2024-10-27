@@ -7,6 +7,7 @@ import axios, {
 import { ACCESS_TOKEN } from '@org/common';
 import { ApiResponse, Error } from '@org/types';
 import Cookies from 'js-cookie';
+import { GetPostsResponse, Post, UploadImageResponse } from '../types/index';
 
 class Api {
   private instance: AxiosInstance;
@@ -34,7 +35,6 @@ class Api {
       }
     );
 
-    // 添加響應攔截器
     this.instance.interceptors.response.use(
       (response: AxiosResponse<ApiResponse>) => response,
       (error: AxiosError<Error>) => {
@@ -43,17 +43,14 @@ class Api {
     );
   }
 
-  // 設置 token
   setToken(token: string) {
     Cookies.set(ACCESS_TOKEN, token, { secure: true, sameSite: 'strict' });
   }
 
-  // 清除 token
   clearToken() {
     Cookies.remove(ACCESS_TOKEN);
   }
 
-  // GET 請求
   async get<T = ApiResponse>(
     url: string,
     config?: AxiosRequestConfig
@@ -62,10 +59,9 @@ class Api {
     return response.data;
   }
 
-  // POST 請求
   async post<T = ApiResponse>(
     url: string,
-    data?: any,
+    data?: unknown,
     config?: AxiosRequestConfig
   ): Promise<T> {
     const response: AxiosResponse<T> = await this.instance.post(
@@ -76,10 +72,9 @@ class Api {
     return response.data;
   }
 
-  // PUT 請求
   async put<T = ApiResponse>(
     url: string,
-    data?: any,
+    data?: unknown,
     config?: AxiosRequestConfig
   ): Promise<T> {
     const response: AxiosResponse<T> = await this.instance.put(
@@ -90,7 +85,19 @@ class Api {
     return response.data;
   }
 
-  // DELETE 請求
+  async patch<T = ApiResponse>(
+    url: string,
+    data?: unknown,
+    config?: AxiosRequestConfig
+  ): Promise<T> {
+    const response: AxiosResponse<T> = await this.instance.patch(
+      url,
+      data,
+      config
+    );
+    return response.data;
+  }
+
   async delete<T = ApiResponse>(
     url: string,
     config?: AxiosRequestConfig
@@ -98,10 +105,33 @@ class Api {
     const response: AxiosResponse<T> = await this.instance.delete(url, config);
     return response.data;
   }
+
+  async getPosts(page = 1, limit = 10): Promise<GetPostsResponse> {
+    return this.get(`/posts?page=${page}&limit=${limit}`);
+  }
+
+  async createPost(postData: Partial<Post>) {
+    return this.post('/posts', postData);
+  }
+
+  async updatePost(id: string, postData: Partial<Post>) {
+    return this.patch(`/posts/${id}`, postData);
+  }
+
+  async deletePost(id: string): Promise<void> {
+    await this.delete(`/posts/${id}`);
+  }
+
+  async uploadImage(file: File | Blob): Promise<UploadImageResponse> {
+    const formData = new FormData();
+    formData.append('image', file);
+    return this.post('/upload/image', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  }
 }
 
-// 創建並導出 API 實例
-const API = new Api(
-  '/api/bo' || 'https://api.example.com'
-);
+const API = new Api('/api/bo');
 export default API;
