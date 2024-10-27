@@ -139,7 +139,9 @@ const AdvertisementManagement: React.FC = () => {
                   errors.startDate && touched.startDate ? 'error' : ''
                 }
                 help={
-                  errors.startDate && touched.startDate ? errors.startDate : ''
+                  errors.startDate && touched.startDate
+                    ? String(errors.startDate)
+                    : ''
                 }
               >
                 <DatePicker
@@ -153,7 +155,11 @@ const AdvertisementManagement: React.FC = () => {
                 validateStatus={
                   errors.endDate && touched.endDate ? 'error' : ''
                 }
-                help={errors.endDate && touched.endDate ? errors.endDate : ''}
+                help={
+                  errors.endDate && touched.endDate
+                    ? String(errors.endDate)
+                    : ''
+                }
               >
                 <DatePicker
                   name="endDate"

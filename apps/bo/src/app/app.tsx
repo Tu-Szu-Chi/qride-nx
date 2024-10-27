@@ -5,10 +5,6 @@ import { Route, Routes, Link } from 'react-router-dom';
 export function App() {
   return (
     <div>
-      <style jsx>{`
-        /** your style here **/
-      `}</style>
-
       <NxWelcome title="bo" />
 
       {/* START: routes */}
