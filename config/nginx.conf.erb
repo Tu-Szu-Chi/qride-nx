@@ -1,7 +1,7 @@
 daemon off;
 pid /app/nginx.pid;
 worker_processes <%= ENV['NGINX_WORKERS'] || 4 %>;
-error_log stderr info;
+error_log stderr info;  # 改回 info level
 
 events {
     use epoll;
@@ -16,14 +16,26 @@ http {
 
     server_tokens off;
 
+    # 標準的 log format
     log_format l2met 'measure#nginx.service=$request_time request_id=$http_x_request_id';
-    log_format debug_log 'DEBUG: [$time_local] $remote_addr "$request" '
-                        '$status $body_bytes_sent "$http_referer" "$http_user_agent" '
-                        'Target: "$proxy_host$uri" '
-                        'Upstream_Status: $upstream_status '
-                        'Response_Time: $upstream_response_time';
+    # 增加一個更詳細但不過度的 log format
+    log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                    '$status $body_bytes_sent "$http_referer" '
+                    '"$http_user_agent" "$http_x_forwarded_for"';
 
     access_log <%= ENV['NGINX_ACCESS_LOG_PATH'] || '/dev/stdout' %> l2met;
+    # 日誌格式增加更多資訊
+    log_format debug_fmt '$remote_addr - $remote_user [$time_local] '
+                     '"$request" $status $body_bytes_sent '
+                     '"$http_referer" "$http_user_agent" '
+                     'rt=$request_time uct="$upstream_connect_time" '
+                     'uht="$upstream_header_time" urt="$upstream_response_time" '
+                     'request_id=$http_x_request_id '
+                     'request_length=$request_length '
+                     'upstream_status=$upstream_status';
+
+    # 增加 error_log 詳細程度
+    error_log stderr debug;
 
     include mime.types;
     default_type application/octet-stream;
@@ -42,38 +54,26 @@ http {
         }
 
         location /api/bo/ {
-            # Debug logs
-            access_log stderr debug_log;
-            error_log stderr debug;
-
-            # 記錄請求資訊
-            add_header X-Debug-Request-URI $request_uri always;
-            add_header X-Debug-Original-URI $uri always;
-            add_header X-Debug-Proxy-Host $proxy_host always;
-            add_header X-Debug-Target <%= ENV['BO_PUBLIC_API_URL'] %>/api/bo$uri always;
-            add_header X-Debug-Upstream-Status $upstream_status always;
-            add_header X-Debug-Response-Time $upstream_response_time always;
-
+            add_header X-Debug-Headers $http_origin;  # 除錯用
+            error_log /dev/stdout debug;  # 增加 nginx 除錯
+            access_log <%= ENV['NGINX_ACCESS_LOG_PATH'] || '/dev/stdout' %> debug_fmt;
+            
             proxy_pass <%= ENV['BO_PUBLIC_API_URL'] %>/api/bo/;
             proxy_http_version 1.1;
-            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Upgrade 'none';
             proxy_set_header Connection 'upgrade';
             proxy_set_header Host $proxy_host;
+            proxy_set_header Origin $http_origin;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
-
-            # CORS headers
-            add_header 'Access-Control-Allow-Origin' '*' always;
-            add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS' always;
-            add_header 'Access-Control-Allow-Headers' '*' always;
+            proxy_pass_request_headers on;
             
             if ($request_method = 'OPTIONS') {
                 return 204;
             }
         }
 
-        # 原有的 uploads 配置保持不變
         location /uploads/ {
             proxy_pass <%= ENV['BO_PUBLIC_API_URL'] %>;
             proxy_http_version 1.1;
