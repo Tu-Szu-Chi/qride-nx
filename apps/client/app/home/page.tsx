@@ -49,11 +49,11 @@ export default function Index() {
         <h2 className="text-primary pl-6 font-bold italic text-2xl mb-3">Latest News</h2>
         <div className="space-y-4">
           {posts.map((item, index) => (
-            <NewsItem key={index} type={item.category} title={item.title} date={new Date(item.publishStartDate)} />
+            <NewsItem key={index} type={item.category} title={item.title} date={new Date(item.publishStartDate)} imgUrl={item.coverImage} id={item.id} />
           ))}
         </div>
         <div className="mt-4 text-center">
-          <a href="#" className="text-primary font-bold text-base">
+          <a href="/news" className="text-primary font-bold text-base">
             Check for more
           </a>
         </div>
