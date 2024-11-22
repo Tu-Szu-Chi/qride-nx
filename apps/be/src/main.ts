@@ -32,6 +32,9 @@ async function bootstrap() {
 
   app.useStaticAssets(join(process.cwd(), 'apps/be/uploads'), {
     prefix: '/uploads/',
+    index: false,
+    redirect: false,
+    maxAge: 7 * 24 * 60 * 60 * 1000, 
   });
 
   app.useGlobalFilters(new AllExceptionsFilter());

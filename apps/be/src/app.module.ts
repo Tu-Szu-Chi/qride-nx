@@ -1,5 +1,3 @@
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './modules/user/user.module';
@@ -13,22 +11,6 @@ import { PostsBoModule } from './modules/bo/posts/posts.module';
 
 @Module({
   imports: [
-    ServeStaticModule.forRoot(
-      {
-        rootPath: join(__dirname, '..', 'public'),
-        serveRoot: '/public',
-      },
-      {
-        rootPath: join(__dirname, '..', 'uploads'),
-        serveRoot: '/uploads',
-        serveStaticOptions: {
-          index: false,
-          redirect: false,
-          cacheControl: true,
-          maxAge: 7 * 24 * 60 * 60 * 1000,
-        },
-      }
-    ),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
