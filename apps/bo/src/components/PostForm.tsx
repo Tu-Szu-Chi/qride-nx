@@ -20,10 +20,11 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import API from '../utils/fetch';
 import { FormValues } from '../types/post';
-import { PostEntity } from '@org/types'
+import { PostEntity } from '@org/types';
 import { quillFormats, createQuillModules } from '../config/quillConfig';
 import { UploadChangeParam } from 'antd/lib/upload';
 import { UploadFile } from 'antd/es/upload/interface';
+import { CODE_SUCCESS } from '@org/common';
 
 dayjs.extend(utc);
 
@@ -72,6 +73,22 @@ const PostForm: React.FC<PostFormProps> = ({
     }
   }, [initialValues, form]);
 
+  const uploadAction = useCallback(async (file: File | Blob) => {
+    return API.uploadImage(file)
+    .then((res) => {
+        if (res.bizCode != CODE_SUCCESS) {
+          message.error('Upload failed: ' + (res.message || 'Unknown error'));
+        return { imageUrl: '' };
+        }
+        return { imageUrl: res.data.imageUrl };
+      })
+      .catch((error) => {
+        message.error(
+          'Upload failed: ' + (error.response.data.message || 'Unknown error')
+        );
+        return { imageUrl: '' };
+      });
+  }, []);
   const handleImageUpload = useCallback(() => {
     const input = document.createElement('input');
     input.setAttribute('type', 'file');
@@ -81,7 +98,7 @@ const PostForm: React.FC<PostFormProps> = ({
     input.onchange = async () => {
       if (input.files) {
         const file = input.files[0];
-        const { imageUrl } = await API.uploadImage(file);
+        const { imageUrl } = await uploadAction(file);
         const quill = quillRef.current?.getEditor();
         if (quill) {
           const range = quill.getSelection(true);
@@ -115,14 +132,9 @@ const PostForm: React.FC<PostFormProps> = ({
       }
 
       if (fileToUpload) {
-        try {
-          const response = await API.uploadImage(fileToUpload);
-          setPreviewImage(response.imageUrl);
-          setCoverImageUrl(response.imageUrl);
-        } catch (error) {
-          console.error('Error uploading cover image:', error);
-          message.error('Upload failed: ' + (error.message || 'Unknown error'));
-        }
+        const { imageUrl } = await uploadAction(fileToUpload);
+        setPreviewImage(imageUrl);
+        setCoverImageUrl(imageUrl);
       } else {
         message.error(`Can't handle ${file.name}.`);
       }

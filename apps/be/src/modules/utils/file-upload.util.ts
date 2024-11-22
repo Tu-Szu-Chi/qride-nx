@@ -3,7 +3,7 @@ import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
-const uploadDirectory = join(process.cwd(), 'uploads');
+const uploadDirectory = join(process.cwd(), 'apps/be/uploads');
 
 // 確保上傳目錄存在
 if (!existsSync(uploadDirectory)) {

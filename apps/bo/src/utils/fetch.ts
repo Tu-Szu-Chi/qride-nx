@@ -217,7 +217,7 @@ class Api {
     await this.delete(`/posts/${id}`);
   }
 
-  async uploadImage(file: File | Blob): Promise<UploadImageResponse> {
+  async uploadImage(file: File | Blob): Promise<ApiResponse<UploadImageResponse>> {
     const formData = new FormData();
     formData.append('image', file);
     return this.post('/posts/upload/image', formData, {
