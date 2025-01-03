@@ -23,14 +23,42 @@ Learn more about [Nx generators on the docs](https://nx.dev/plugin-features/use-
 
 ### Run on local
 
-```shell
-heroku login
-heroku buildpacks:add -a <app> heroku-community/multi-procfile
-heroku buildpacks:add -a <app> https://github.com/unfold/heroku-buildpack-pnpm
+#### .git/config
+
+```config
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+	ignorecase = true
+	precomposeunicode = true
+[remote "origin"]
+  url = git@github.com:Tu-Szu-Chi/qride-nx.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "main"]
+	remote = origin
+	merge = refs/heads/main
+[remote "client"]
+	url = https://git.heroku.com/q-client.git
+	fetch = +refs/heads/*:refs/remotes/heroku/*
+[remote "be"]
+	url = https://git.heroku.com/q-be.git
+	fetch = +refs/heads/*:refs/remotes/heroku/*
+[remote "bo"]
+	url = https://git.heroku.com/q-bo.git
+	fetch = +refs/heads/*:refs/remotes/heroku/*
+
 ```
 
-**Heroku:: env**
-- PROCFILE (apps/\<app\>/Procfile)
-- PROJECT_NAME (\<app\>)
+```shell
+heroku login (if auth expired)
+git push <app> main
+# app => [client, be, bo]
+```
+
+## Note
+
+`org/config/nginx.conf.erb` is for *bo* app
 
 *Remember to create apps/\<app\>/Procfile by yourself*
