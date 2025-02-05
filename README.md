@@ -9,6 +9,10 @@
 
 To start the development server run `nx serve app_name`. Open your browser and navigate to http://localhost:4200/. Happy coding!
 
+### DB migration
+1. ` docker-compose -f ./docker-compose.yml up -d`
+2. `npm run clean`
+3. `npm run migrate`
 
 ## Generate code
 
