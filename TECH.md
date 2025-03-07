@@ -41,5 +41,8 @@
    - 統一的錯誤響應格式
    - 詳細的錯誤日誌
 
+## 特殊配置
+
+1. DB駝峰轉換 (db.config.ts::CamelCasePool)
 
 
